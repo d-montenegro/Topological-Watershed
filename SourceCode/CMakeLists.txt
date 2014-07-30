@@ -1,11 +1,20 @@
-cmake_minimum_required (VERSION 2.8.7)
-project (TopologicalWatershed)
+cmake_minimum_required(VERSION 2.8.7)
+project(TopologicalWatershed)
 
-#version number
-set (TopologicalWatershed_VERSION_MAJOR 1)
-set (TopologicalWatershed_VERSION_MINOR 0)
+# version number
+set(TopologicalWatershed_VERSION_MAJOR 1)
+set(TopologicalWatershed_VERSION_MINOR 0)
 
-#include the subdirectory containing our libs
-add_subdirectory (TopologicalWatershed)
+# check compiler version
+#if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
+#    message(FATAL_ERROR "G++ version must be at least 4.8")
+#endif()
 
+# compilation flags
+SET(CMAKE_CXX_FLAGS  "-Wall -Wextra -ansi -pedantic -Weffc++ -g -std=c++11")
 
+# include the subdirectory containing our libs
+add_subdirectory(ImageHandler)
+add_subdirectory(DisjointSetCollection)
+add_subdirectory(ComponentTree)
+add_subdirectory(TopologicalWatershed)
