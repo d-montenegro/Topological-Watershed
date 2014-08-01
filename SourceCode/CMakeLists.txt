@@ -5,6 +5,9 @@ project(TopologicalWatershed)
 set(TopologicalWatershed_VERSION_MAJOR 1)
 set(TopologicalWatershed_VERSION_MINOR 0)
 
+# Options. Turn on to build and run tests.
+option(test "Build and Run tests." ON) # Makes boolean 'test' available.
+
 # check compiler version
 #if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
 #    message(FATAL_ERROR "G++ version must be at least 4.8")
@@ -18,3 +21,10 @@ add_subdirectory(ImageHandler)
 add_subdirectory(DisjointSetCollection)
 add_subdirectory(ComponentTree)
 add_subdirectory(TopologicalWatershed)
+
+if (test)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/gtest-1.7.0)
+    enable_testing()
+    include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+    add_subdirectory(${CMAKE_SOURCE_DIR}/ImageHandler/UnitTest)
+endif()
