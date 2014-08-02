@@ -1,6 +1,6 @@
-#include <exception>
-#include <iterator>
 #include <iostream>
+#include <iterator>
+#include <stdexcept>
 
 #include "DisjointSetCollection.h"
 
@@ -17,7 +17,7 @@ using namespace std;
 
 DisjointSetCollection::~DisjointSetCollection()
 {
-    for (auto &element : disjointSet)
+    for (auto& element : disjointSet)
     {
         delete element.second;
     }
@@ -27,7 +27,7 @@ void DisjointSetCollection::addNewSet(unsigned int element)
 {
     if (disjointSet.count(element) > 0)
     {
-        throw exception();
+        throw invalid_argument("element already exists");
     }
 
     disjointSet[element] = new Element(element);
@@ -37,7 +37,7 @@ unsigned int DisjointSetCollection::find(unsigned int element)
 {
     if (0 == disjointSet.count(element))
     {
-        throw exception();
+        throw invalid_argument("element does not exists");
     }
 
     Element* setElement = disjointSet[element];
@@ -52,12 +52,12 @@ unsigned int DisjointSetCollection::linkSets(unsigned int element1, unsigned int
 {
     if (0 == disjointSet.count(element1))
     {
-        throw exception();
+        throw invalid_argument("element does not exists");
     }
 
     if (0 == disjointSet.count(element2))
     {
-        throw exception();
+        throw invalid_argument("element does not exists");
     }
 
     const unsigned int canonicalElement1 = find(element1);
@@ -65,7 +65,7 @@ unsigned int DisjointSetCollection::linkSets(unsigned int element1, unsigned int
 
     if (canonicalElement1 == canonicalElement2)
     {
-        throw exception();
+        throw invalid_argument("elements already belongs to the same set");
     }
 
     Element* setCanonicalElement1 = disjointSet[canonicalElement1];
