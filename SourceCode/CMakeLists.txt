@@ -5,16 +5,16 @@ project(TopologicalWatershed)
 set(TopologicalWatershed_VERSION_MAJOR 1)
 set(TopologicalWatershed_VERSION_MINOR 0)
 
-# Options. Turn on to build and run tests.
-option(test "Build and Run tests." ON) # Makes boolean 'test' available.
-
-# check compiler version
-#if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
-#    message(FATAL_ERROR "G++ version must be at least 4.8")
-#endif()
+# Options. Turn ON to build tests.
+option(test "Tests." OFF)
 
 # compilation flags
 SET(CMAKE_CXX_FLAGS  "-Wall -Wextra -ansi -pedantic -Weffc++ -g -std=c++11")
+
+# headers
+include_directories(${CMAKE_SOURCE_DIR}/DisjointSetCollection)
+include_directories(${CMAKE_SOURCE_DIR}/ImageHandler)
+include_directories(${CMAKE_SOURCE_DIR}/ComponentTree)
 
 # include the subdirectory containing our libs
 add_subdirectory(ImageHandler)
