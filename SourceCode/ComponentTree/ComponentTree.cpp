@@ -71,7 +71,7 @@ ComponentTree::ComponentTree(const Image& image)
         canonicalElements.addNewSet(pixelPosition);
     }
 
-    PixelArray orderedPixels = SpecialSort(image.getPixels());
+    vector<unsigned int> orderedPixels = SpecialSort(image.getPixels());
     for (unsigned int pixelPosition = 0; pixelPosition < totalPixels;
          pixelPosition++)
     {

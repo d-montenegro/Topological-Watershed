@@ -5,15 +5,13 @@
 
 using namespace std;
 
-using PixelArray = vector<unsigned int>;
-
 class Image
 {
 public:
     /*
      * Constructor.
      */
-    Image(const PixelArray& pixels, const unsigned int width,
+    Image(const vector<unsigned int>& pixels, const unsigned int width,
           const unsigned int height) : pixels(pixels), width(width),
                                        height(height) {}
 
@@ -24,12 +22,12 @@ public:
     vector<unsigned int> getNeighbors(unsigned int pixelPosition,
                                       unsigned int lessThan = 0) const;
 
-    PixelArray getPixels() const { return pixels; }
+    vector<unsigned int> getPixels() const { return pixels; }
     unsigned int getWidth() const { return width; }
     unsigned int getHeight() const { return height; }
 
 private:
-    PixelArray pixels;
+    vector<unsigned int> pixels;
     const unsigned int width;
     const unsigned int height;
 };
