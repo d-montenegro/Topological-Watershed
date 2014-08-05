@@ -17,6 +17,8 @@ public:
           const unsigned int height) : pixels(pixels), width(width),
                                        height(height) {}
 
+    virtual ~Image() {}
+
     /*
      * Returns the indexes at pixels of the neighbors of the pixel at position
      * 'pixelPosition'.

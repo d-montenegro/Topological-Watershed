@@ -26,6 +26,7 @@ private:
 
     ComponentMapping componentMapping;
     NodeVector nodes;
+    Node* root;
 };
 
 #endif // __COMPONENTTREE_H_INCLUDED__

@@ -42,12 +42,45 @@ vector<ushort> SpecialSort (const vector<ushort>& arr)
     return result;
 }
 
+// UTILITIES
+vector<Node*> eulerTour;
+map<Node*,unsigned int> representatives;
+
+void calculateEulerTour(Node* root)
+{
+    eulerTour.push_back(root);
+    for (auto& child : root->getChilds())
+    {
+        calculateEulerTour(child);
+        eulerTour.push_back(root);
+    }
+}
+
+void calculateRepresentatives(Node* root)
+{
+    unsigned int pos = 0;
+    for (auto& node : eulerTour)
+    {
+        if (node == root)
+        {
+            representatives[root] = pos;
+            break;
+        }
+        pos++;
+    }
+    for (auto& child : root->getChilds())
+    {
+        calculateRepresentatives(child);
+    }
+
+}
 } // namespace
 
 /*
  * Constructor. Builds component tree
  */
-ComponentTree::ComponentTree(const Image& image)
+ComponentTree::ComponentTree(const Image& image) : componentMapping(), nodes(),
+    root()
 {
     // stores all the partial trees being made during component tree building
     DisjointSetCollection partialTrees;
@@ -78,7 +111,7 @@ ComponentTree::ComponentTree(const Image& image)
         unsigned int currentPartialTree = partialTrees.find(currentPixel);
 
         // Get the Node of the partial tree root current pixel belongs to
-        int currentNode = canonicalElements.find(partialTreeRoot.at(currentPartialTree));
+        unsigned int currentNode = canonicalElements.find(partialTreeRoot.at(currentPartialTree));
 
         // Iterate neighbors with lowest grey level
         vector<unsigned int> neighbors = image.getLowerOrEqualNeighbors(currentPixel);
@@ -88,7 +121,7 @@ ComponentTree::ComponentTree(const Image& image)
             unsigned int neighborPartialTree = partialTrees.find(currentNeighbor);
 
             // Get the Node of the partial tree root current pixeneighborl belongs to
-            int neighborNode = canonicalElements.
+            unsigned int neighborNode = canonicalElements.
                     find(partialTreeRoot.at(neighborPartialTree));
 
             if (currentNode != neighborNode)
@@ -128,6 +161,10 @@ ComponentTree::ComponentTree(const Image& image)
         {
             componentMapping[pixelPosition] = nodes.at(canonicalElements.find(pixelPosition));
         }
+
+        Node* root = nodes.at(partialTreeRoot.at(partialTrees.find(canonicalElements.find(0))));
+        calculateEulerTour(root);
+        calculateRepresentatives(root);
     }
 }
 
@@ -154,7 +191,28 @@ Node* ComponentTree::getMinimumNode(const NodeVector& nodes)
 
 Node* ComponentTree::getBinaryLeastCommonAncestor(Node* node1, Node* node2)
 {
-    return 0;
+    unsigned int node1Representative = representatives[node1];
+    unsigned int node2Representative = representatives[node2];
+
+    if (node1Representative > node2Representative)
+    {
+        // lets do a swap
+        unsigned int temp = node1Representative;
+        node1Representative = node2Representative;
+        node2Representative = temp;
+    }
+
+    ushort minorLevel = eulerTour.at(node1Representative)->getLevel();
+    for (unsigned int index = node1Representative + 1;
+         index <= node2Representative; index++)
+    {
+        if (eulerTour.at(index)->getLevel() < minorLevel)
+        {
+            minorLevel = index;
+        }
+    }
+
+    return eulerTour.at(minorLevel);
 }
 
 

@@ -6,7 +6,7 @@
 using namespace std;
 
 class Node;
-typedef vector<Node*> NodeVector;
+using NodeVector = vector<Node*>;
 
 class Node
 {

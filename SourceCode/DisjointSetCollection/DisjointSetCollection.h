@@ -11,6 +11,8 @@ struct Element;
 class DisjointSetCollection
 {
 public:
+    DisjointSetCollection() : disjointSet() {}
+
     ~DisjointSetCollection();
     /*
      * Adds the set {element} to the collection, 'element' must not belongs to
