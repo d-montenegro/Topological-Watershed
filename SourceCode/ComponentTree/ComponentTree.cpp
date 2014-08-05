@@ -13,8 +13,8 @@ namespace
 
 struct ArraySorter
 {
-    const vector<unsigned int> arr;
-    ArraySorter(const vector<unsigned int>& arr) : arr(arr) {}
+    const vector<ushort> arr;
+    ArraySorter(const vector<ushort>& arr) : arr(arr) {}
 
     bool operator() (unsigned int a, unsigned int b) const
     {
@@ -28,9 +28,9 @@ struct ArraySorter
  * If input is [3,5,4,1], the output will be [3,0,2,1] because at position 3 is
  * the lowest value (1), at position 0 is the next lowest value (3) and so on.
  */
-vector<unsigned int> SpecialSort (const vector<unsigned int>& arr)
+vector<ushort> SpecialSort (const vector<ushort>& arr)
 {
-    vector<unsigned int> result;
+    vector<ushort> result;
 
     for (unsigned int i = 0; i < arr.size(); i++)
     {
@@ -71,12 +71,9 @@ ComponentTree::ComponentTree(const Image& image)
         canonicalElements.addNewSet(pixelPosition);
     }
 
-    vector<unsigned int> orderedPixels = SpecialSort(image.getPixels());
-    for (unsigned int pixelPosition = 0; pixelPosition < totalPixels;
-         pixelPosition++)
+    vector<ushort> orderedPixels = SpecialSort(image.getPixels());
+    for (auto& currentPixel : orderedPixels)
     {
-        unsigned int currentPixel = orderedPixels.at(pixelPosition);
-
         // Get the partial tree the current pixel belongs to
         unsigned int currentPartialTree = partialTrees.find(currentPixel);
 
@@ -85,11 +82,8 @@ ComponentTree::ComponentTree(const Image& image)
 
         // Iterate neighbors with lowest grey level
         vector<unsigned int> neighbors = image.getLowerOrEqualNeighbors(currentPixel);
-        for (unsigned int neighborPosition = 0; neighborPosition < neighbors.size();
-             neighborPosition++)
+        for (auto& currentNeighbor :  neighbors)
         {
-            unsigned int currentNeighbor = neighbors.at(neighborPosition);
-
             // partial tree of the neighbor
             unsigned int neighborPartialTree = partialTrees.find(currentNeighbor);
 

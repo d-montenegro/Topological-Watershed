@@ -3,6 +3,8 @@
 
 #include <vector>
 
+using ushort = unsigned short;
+
 using namespace std;
 
 class Image
@@ -11,7 +13,7 @@ public:
     /*
      * Constructor.
      */
-    Image(const vector<unsigned int>& pixels, const unsigned int width,
+    Image(const vector<ushort>& pixels, const unsigned int width,
           const unsigned int height) : pixels(pixels), width(width),
                                        height(height) {}
 
@@ -27,12 +29,12 @@ public:
      */
     virtual vector<unsigned int> getLowerOrEqualNeighbors(unsigned int pixelPosition) const = 0;
 
-    vector<unsigned int> getPixels() const { return pixels; }
+    vector<ushort> getPixels() const { return pixels; }
     unsigned int getWidth() const { return width; }
     unsigned int getHeight() const { return height; }
 
 protected:
-    vector<unsigned int> pixels;
+    vector<ushort> pixels;
     const unsigned int width;
     const unsigned int height;
 };

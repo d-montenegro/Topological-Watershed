@@ -10,7 +10,7 @@ using namespace std;
 class ImageFourNeighborType : public Image
 {
 public:
-    ImageFourNeighborType(const vector<unsigned int>& pixels,
+    ImageFourNeighborType(const vector<ushort>& pixels,
                           const unsigned int width, const unsigned int height)
         : Image(pixels,width,height) {}
     /*
@@ -27,7 +27,7 @@ public:
 
 private:
     vector<unsigned int> getNeighbors(unsigned int pixelPosition,
-                                      unsigned int maxValue) const;
+                                      ushort maxValue) const;
 
 };
 

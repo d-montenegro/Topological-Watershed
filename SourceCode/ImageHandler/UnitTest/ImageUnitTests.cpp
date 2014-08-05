@@ -7,7 +7,7 @@
 
 
 TEST(ImageTest, checkNeighbors) {
-    vector<unsigned int> dummyPixelArray = { 0,1,2,3,4,5,6,7,8 };
+    vector<unsigned short> dummyPixelArray = { 0,1,2,3,4,5,6,7,8 };
     ImageFourNeighborType image(dummyPixelArray,3,3);
 
     vector<unsigned int> neighbors = image.getNeighbors(4);

@@ -6,7 +6,7 @@ using namespace std;
 vector<unsigned int> ImageFourNeighborType::getNeighbors(
         unsigned int pixelPosition) const
 {
-    return getNeighbors(pixelPosition, std::numeric_limits<unsigned int>::max());
+    return getNeighbors(pixelPosition, numeric_limits<ushort>::max());
 }
 
 /*
@@ -20,9 +20,9 @@ vector<unsigned int> ImageFourNeighborType::getLowerOrEqualNeighbors(
 }
 
 vector<unsigned int> ImageFourNeighborType::getNeighbors(
-        unsigned int pixelPosition, unsigned int maxValue) const
+        unsigned int pixelPosition, ushort maxValue) const
 {
-    unsigned int greyLevel = pixels.at(pixelPosition);
+    ushort greyLevel = pixels.at(pixelPosition);
     vector<unsigned int> neighbors;
 
 

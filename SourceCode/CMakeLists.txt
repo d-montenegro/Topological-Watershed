@@ -6,7 +6,7 @@ set(TopologicalWatershed_VERSION_MAJOR 1)
 set(TopologicalWatershed_VERSION_MINOR 0)
 
 # Options. Turn ON to build tests.
-option(test "Tests." ON)
+option(test "Tests." OFF)
 
 # compilation flags
 SET(CMAKE_CXX_FLAGS  "-Wall -Wextra -ansi -pedantic -Weffc++ -g -std=c++11")

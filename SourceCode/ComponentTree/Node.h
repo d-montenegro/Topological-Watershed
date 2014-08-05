@@ -11,14 +11,14 @@ typedef vector<Node*> NodeVector;
 class Node
 {
 public:
-    Node(unsigned int l) : level(l), childs() {}
+    Node(unsigned short l) : level(l), childs() {}
     void addChilds(NodeVector nodes) { childs.insert(childs.end(), nodes.begin(), nodes.end()); }
 
-    unsigned int getLevel() { return level; }
+    unsigned short getLevel() { return level; }
     NodeVector getChilds() { return childs; }
 
 private:
-    unsigned int level;
+    unsigned short level;
     NodeVector childs;
 };
 
