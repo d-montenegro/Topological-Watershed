@@ -14,8 +14,10 @@ public:
      * Constructor.
      */
     Image(const vector<ushort>& pixels, const unsigned int width,
-          const unsigned int height) : pixels(pixels), width(width),
-                                       height(height) {}
+          const unsigned int height, const ushort lowestGreyIntensity,
+          const ushort highestGreyIntensity) : pixels(pixels), width(width),
+        height(height), lowestGreyIntensity(lowestGreyIntensity),
+        highestGreyIntensity(highestGreyIntensity) {}
 
     virtual ~Image() {}
 
@@ -34,11 +36,15 @@ public:
     vector<ushort> getPixels() const { return pixels; }
     unsigned int getWidth() const { return width; }
     unsigned int getHeight() const { return height; }
+    ushort getLowestGreyIntensity() const { return lowestGreyIntensity; }
+    ushort getHighestGreyIntensity() const { return highestGreyIntensity; }
 
 protected:
     vector<ushort> pixels;
     const unsigned int width;
     const unsigned int height;
+    const ushort lowestGreyIntensity;
+    const ushort highestGreyIntensity;
 };
 
 #endif // __IMAGE_H_INCLUDED__
