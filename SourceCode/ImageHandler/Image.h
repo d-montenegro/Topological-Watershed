@@ -17,16 +17,21 @@ public:
 
     /*
      * Returns the indexes at pixels of the neighbors of the pixel at position
-     * 'pixelPosition' at pixels. For now, assuming type-4 neighbour relation.
+     * 'pixelPosition'.
      */
-    vector<unsigned int> getNeighbors(unsigned int pixelPosition,
-                                      unsigned int lessThan = 0) const;
+    virtual vector<unsigned int> getNeighbors(unsigned int pixelPosition) const = 0;
+
+    /*
+     * Returns the indexes at pixels of the neighbors of the pixel at position
+     * 'pixelPosition' which value is lower or equal than its value.
+     */
+    virtual vector<unsigned int> getLowerOrEqualNeighbors(unsigned int pixelPosition) const = 0;
 
     vector<unsigned int> getPixels() const { return pixels; }
     unsigned int getWidth() const { return width; }
     unsigned int getHeight() const { return height; }
 
-private:
+protected:
     vector<unsigned int> pixels;
     const unsigned int width;
     const unsigned int height;

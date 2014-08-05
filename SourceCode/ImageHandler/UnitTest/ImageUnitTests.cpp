@@ -3,12 +3,12 @@
 
 #include "gtest/gtest.h"
 
-#include "Image.h"
+#include "ImageFourNeighborType.h"
 
 
 TEST(ImageTest, checkNeighbors) {
     vector<unsigned int> dummyPixelArray = { 0,1,2,3,4,5,6,7,8 };
-    Image image(dummyPixelArray,3,3);
+    ImageFourNeighborType image(dummyPixelArray,3,3);
 
     vector<unsigned int> neighbors = image.getNeighbors(4);
     ASSERT_EQ(4,neighbors.size());

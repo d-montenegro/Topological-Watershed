@@ -1,4 +1,4 @@
 add_executable(ImageUnitTests ImageUnitTests.cpp)
-target_link_libraries(ImageUnitTests gtest gtest_main Image)
+target_link_libraries(ImageUnitTests gtest gtest_main ImageFourNeighborType)
 
 add_test(NAME checkNeighbors COMMAND ImageUnitTests)

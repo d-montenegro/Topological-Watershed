@@ -1,10 +1,26 @@
-#include "Image.h"
+#include <limits>
+#include "ImageFourNeighborType.h"
 
 using namespace std;
 
-// For now assuming 4-neighbour relation
-vector<unsigned int> Image::getNeighbors(unsigned int pixelPosition,
-                                              unsigned int lessThan) const
+vector<unsigned int> ImageFourNeighborType::getNeighbors(
+        unsigned int pixelPosition) const
+{
+    return getNeighbors(pixelPosition, std::numeric_limits<unsigned int>::max());
+}
+
+/*
+ * Returns the indexes at pixels of the neighbors of the pixel at position
+ * 'pixelPosition' which value is lower or equal than its value.
+ */
+vector<unsigned int> ImageFourNeighborType::getLowerOrEqualNeighbors(
+        unsigned int pixelPosition) const
+{
+    return getNeighbors(pixelPosition, pixels.at(pixelPosition));
+}
+
+vector<unsigned int> ImageFourNeighborType::getNeighbors(
+        unsigned int pixelPosition, unsigned int maxValue) const
 {
     unsigned int greyLevel = pixels.at(pixelPosition);
     vector<unsigned int> neighbors;
@@ -13,7 +29,7 @@ vector<unsigned int> Image::getNeighbors(unsigned int pixelPosition,
     if (pixelPosition >= width)
     {
         // I'm not in row 0, then I have a neighbour in the up row
-        if (0 == lessThan || greyLevel < lessThan)
+        if (greyLevel <= maxValue)
         {
             neighbors.push_back(pixelPosition - width);
         }
@@ -22,7 +38,7 @@ vector<unsigned int> Image::getNeighbors(unsigned int pixelPosition,
     if (pixelPosition < width * (height - 1))
     {
         // I'm not last row, then I have a neighbour in the previous row
-        if (0 == lessThan || greyLevel < lessThan)
+        if (greyLevel <= maxValue)
         {
             neighbors.push_back(pixelPosition + width);
         }
@@ -31,7 +47,7 @@ vector<unsigned int> Image::getNeighbors(unsigned int pixelPosition,
     if (0 != pixelPosition % width)
     {
         // I'm not in the first column, then I have a neighbour on the left
-        if (0 == lessThan || greyLevel < lessThan)
+        if (greyLevel <= maxValue)
         {
             neighbors.push_back(pixelPosition - 1);
         }
@@ -40,7 +56,7 @@ vector<unsigned int> Image::getNeighbors(unsigned int pixelPosition,
     if (0 != (pixelPosition + 1) % width)
     {
         // I'm not in the last column, then I have a neighbour on the right
-        if (0 == lessThan || greyLevel < lessThan)
+        if (greyLevel <= maxValue)
         {
             neighbors.push_back(pixelPosition + 1);
         }

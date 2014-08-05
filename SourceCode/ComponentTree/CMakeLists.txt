@@ -1,2 +1,2 @@
 add_library(ComponentTree ComponentTree.cpp)
-target_link_libraries(ComponentTree DisjointSetCollection Image)
+target_link_libraries(ComponentTree DisjointSetCollection ImageFourNeighborType)

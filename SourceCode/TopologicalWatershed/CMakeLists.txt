@@ -1,2 +1,2 @@
 add_executable(TopologicalWatershed TopologicalWatershed.cpp)
-target_link_libraries(TopologicalWatershed Image ComponentTree)
+target_link_libraries(TopologicalWatershed ImageFourNeighborType ComponentTree)

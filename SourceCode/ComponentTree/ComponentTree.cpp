@@ -84,8 +84,7 @@ ComponentTree::ComponentTree(const Image& image)
         int currentNode = canonicalElements.find(partialTreeRoot.at(currentPartialTree));
 
         // Iterate neighbors with lowest grey level
-        vector<unsigned int> neighbors = image.getNeighbors
-                (currentPixel,image.getPixels().at(currentPixel) + 1);
+        vector<unsigned int> neighbors = image.getLowerOrEqualNeighbors(currentPixel);
         for (unsigned int neighborPosition = 0; neighborPosition < neighbors.size();
              neighborPosition++)
         {
