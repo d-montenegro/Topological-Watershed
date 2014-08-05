@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <stdexcept>
 
 #include "ComponentTree.h"
 #include "DisjointSetCollection.h"
@@ -80,7 +81,7 @@ void calculateRepresentatives(Node* root)
  * Constructor. Builds component tree
  */
 ComponentTree::ComponentTree(const Image& image) : componentMapping(), nodes(),
-    root()
+    root(0)
 {
     // stores all the partial trees being made during component tree building
     DisjointSetCollection partialTrees;
@@ -181,11 +182,37 @@ ComponentTree::~ComponentTree()
 
 Node* ComponentTree::getHighestFork(const NodeVector& nodes)
 {
-    return 0;
-}
+    if (nodes.size() < 2)
+    {
+        throw invalid_argument
+                ("To calculate gighest fork we need at least two nodes");
+    }
+    Node* minLevelNode = nodes.at(0);
+    for (auto& node: nodes)
+    {
+        if (node->getLevel() < minLevelNode->getLevel())
+        {
+            minLevelNode = node;
+        }
+    }
 
-Node* ComponentTree::getMinimumNode(const NodeVector& nodes)
-{
+    Node* highestFork = minLevelNode;
+    for (auto& node : nodes)
+    {
+        if (node != minLevelNode)
+        {
+            Node* blca = getBinaryLeastCommonAncestor(node,highestFork);
+            if (blca != node)
+            {
+                highestFork = node;
+            }
+        }
+    }
+
+    if (highestFork != minLevelNode)
+    {
+        return highestFork;
+    }
     return 0;
 }
 
