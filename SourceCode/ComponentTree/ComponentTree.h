@@ -18,11 +18,12 @@ public:
     ComponentTree(const Image& image);
     ~ComponentTree();
 
-    Node* getHighestFork(const NodeVector& nodes);
-    ComponentMapping getComponentMapping() { return componentMapping; }
+    Node* getMinimum(const NodeVector& nodes) const;
+    Node* getHighestFork(const NodeVector& nodes) const;
+    ComponentMapping getComponentMapping() const { return componentMapping; }
 
 private:
-    Node* getBinaryLeastCommonAncestor(Node *node1, Node *node2);
+    Node* getBinaryLeastCommonAncestor(Node *node1, Node *node2) const;
 
     ComponentMapping componentMapping;
     NodeVector nodes;

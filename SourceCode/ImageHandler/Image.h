@@ -2,6 +2,8 @@
 #define __IMAGE_H_INCLUDED__
 
 #include <vector>
+#include <limits>
+#include <stdexcept>
 
 using ushort = unsigned short;
 
@@ -14,10 +16,36 @@ public:
      * Constructor.
      */
     Image(const vector<ushort>& pixels, const unsigned int width,
-          const unsigned int height, const ushort lowestGreyIntensity,
-          const ushort highestGreyIntensity) : pixels(pixels), width(width),
-        height(height), lowestGreyIntensity(lowestGreyIntensity),
-        highestGreyIntensity(highestGreyIntensity) {}
+          const unsigned int height) : pixels(pixels), width(width),
+        height(height), lowestGreyIntensity(std::numeric_limits<ushort>::max()),
+        highestGreyIntensity(std::numeric_limits<ushort>::min())
+    {
+
+        if (0 == width)
+        {
+            throw invalid_argument("width = 0");
+        }
+        if (0 == height)
+        {
+            throw invalid_argument("height = 0");
+        }
+        if (pixels.size() != width * height)
+        {
+            throw invalid_argument("Total pixels does not match width * height.");
+        }
+
+        for (auto& greyValue : pixels)
+        {
+            if (greyValue < lowestGreyIntensity)
+            {
+                lowestGreyIntensity = greyValue;
+            }
+            if (greyValue > highestGreyIntensity)
+            {
+                highestGreyIntensity = greyValue;
+            }
+        }
+    }
 
     virtual ~Image() {}
 
@@ -33,6 +61,12 @@ public:
      */
     virtual vector<unsigned int> getLowerOrEqualNeighbors(unsigned int pixelPosition) const = 0;
 
+    /*
+     * Returns the indexes at pixels of the neighbors of the pixel at position
+     * 'pixelPosition' which value is lower than its value.
+     */
+    virtual vector<unsigned int> getLowerNeighbors(unsigned int pixelPosition) const = 0;
+
     vector<ushort> getPixels() const { return pixels; }
     unsigned int getWidth() const { return width; }
     unsigned int getHeight() const { return height; }
@@ -43,8 +77,8 @@ protected:
     vector<ushort> pixels;
     const unsigned int width;
     const unsigned int height;
-    const ushort lowestGreyIntensity;
-    const ushort highestGreyIntensity;
+    ushort lowestGreyIntensity;
+    ushort highestGreyIntensity;
 };
 
 #endif // __IMAGE_H_INCLUDED__

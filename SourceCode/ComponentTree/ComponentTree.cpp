@@ -173,19 +173,19 @@ ComponentTree::~ComponentTree()
 {
     for(unsigned int i=0; i < nodes.size(); i++)
     {
-        if (nodes[i])
+        if (nodes.at(i))
         {
-            delete nodes[i];
+            delete nodes.at(i);
         }
     }
 }
 
-Node* ComponentTree::getHighestFork(const NodeVector& nodes)
+Node* ComponentTree::getMinimum(const NodeVector& nodes) const
 {
     if (nodes.size() < 2)
     {
         throw invalid_argument
-                ("To calculate gighest fork we need at least two nodes");
+                ("To calculate minumum we need at least two nodes");
     }
     Node* minLevelNode = nodes.at(0);
     for (auto& node: nodes)
@@ -195,6 +195,18 @@ Node* ComponentTree::getHighestFork(const NodeVector& nodes)
             minLevelNode = node;
         }
     }
+
+    return minLevelNode;
+}
+
+Node* ComponentTree::getHighestFork(const NodeVector& nodes) const
+{
+    if (nodes.size() < 2)
+    {
+        throw invalid_argument
+                ("To calculate highest fork we need at least two nodes");
+    }
+    Node* minLevelNode = getMinimum(nodes);
 
     Node* highestFork = minLevelNode;
     for (auto& node : nodes)
@@ -216,8 +228,20 @@ Node* ComponentTree::getHighestFork(const NodeVector& nodes)
     return 0;
 }
 
-Node* ComponentTree::getBinaryLeastCommonAncestor(Node* node1, Node* node2)
+Node* ComponentTree::getBinaryLeastCommonAncestor(Node* node1, Node* node2) const
 {
+    if (!node1)
+    {
+        throw invalid_argument
+                ("Null node1 to calcula binary least common ancestor");
+    }
+
+    if (!node2)
+    {
+        throw invalid_argument
+                ("Null node2 to calcula binary least common ancestor");
+    }
+
     unsigned int node1Representative = representatives[node1];
     unsigned int node2Representative = representatives[node2];
 

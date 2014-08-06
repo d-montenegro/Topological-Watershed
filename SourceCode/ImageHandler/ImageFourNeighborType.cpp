@@ -19,6 +19,16 @@ vector<unsigned int> ImageFourNeighborType::getLowerOrEqualNeighbors(
     return getNeighbors(pixelPosition, pixels.at(pixelPosition));
 }
 
+/*
+ * Returns the indexes at pixels of the neighbors of the pixel at position
+ * 'pixelPosition' which value is lower or equal than its value.
+ */
+vector<unsigned int> ImageFourNeighborType::getLowerNeighbors(
+        unsigned int pixelPosition) const
+{
+    return getNeighbors(pixelPosition, pixels.at(pixelPosition) - 1);
+}
+
 vector<unsigned int> ImageFourNeighborType::getNeighbors(
         unsigned int pixelPosition, ushort maxValue) const
 {

@@ -11,10 +11,8 @@ class ImageFourNeighborType : public Image
 {
 public:
     ImageFourNeighborType(const vector<ushort>& pixels,
-                          const unsigned int width, const unsigned int height,
-                          const ushort lowestGreyIntensity,
-                          const ushort highestGreyIntensity)
-        : Image(pixels,width,height,lowestGreyIntensity,highestGreyIntensity) {}
+                          const unsigned int width, const unsigned int height)
+        : Image(pixels,width,height) {}
     /*
      * Returns the indexes at pixels of the neighbors of the pixel at position
      * 'pixelPosition'.
@@ -26,6 +24,12 @@ public:
      * 'pixelPosition' which value is lower or equal than its value.
      */
     vector<unsigned int> getLowerOrEqualNeighbors(unsigned int pixelPosition) const;
+
+    /*
+     * Returns the indexes at pixels of the neighbors of the pixel at position
+     * 'pixelPosition' which value is lower than its value.
+     */
+    vector<unsigned int> getLowerNeighbors(unsigned int pixelPosition) const;
 
 private:
     vector<unsigned int> getNeighbors(unsigned int pixelPosition,

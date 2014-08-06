@@ -8,7 +8,7 @@
 
 TEST(ImageTest, checkNeighbors) {
     vector<unsigned short> dummyPixelArray = { 0,0,0,0,0,0,0,0,0 };
-    ImageFourNeighborType image(dummyPixelArray,3,3,0,0);
+    ImageFourNeighborType image(dummyPixelArray,3,3);
 
     vector<unsigned int> neighbors = image.getNeighbors(4);
     ASSERT_EQ(4,neighbors.size());
