@@ -20,13 +20,16 @@ public:
 
     Node* getMinimum(const NodeVector& nodes) const;
     Node* getHighestFork(const NodeVector& nodes) const;
+
+    unsigned int getTotalNodes() const { return totalNodes; }
+    Node* getRoot() const { return root; }
     ComponentMapping getComponentMapping() const { return componentMapping; }
 
 private:
     Node* getBinaryLeastCommonAncestor(Node *node1, Node *node2) const;
 
+    unsigned int totalNodes;
     ComponentMapping componentMapping;
-    NodeVector nodes;
     Node* root;
 };
 

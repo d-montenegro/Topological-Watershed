@@ -13,12 +13,13 @@ class Node
 public:
     Node(unsigned short l) : level(l), childs() {}
     void addChilds(NodeVector nodes) { childs.insert(childs.end(), nodes.begin(), nodes.end()); }
+    void addChilds(Node* node) { childs.push_back(node); }
 
     unsigned short getLevel() { return level; }
     NodeVector getChilds() { return childs; }
 
 private:
-    unsigned short level;
+    const unsigned short level;
     NodeVector childs;
 };
 

@@ -75,13 +75,22 @@ void calculateRepresentatives(Node* root)
     }
 
 }
+
+void deleteTree(Node* root)
+{
+    for (auto& node : root->getChilds())
+    {
+        deleteTree(node);
+    }
+    delete root;
+}
 } // namespace
 
 /*
  * Constructor. Builds component tree
  */
-ComponentTree::ComponentTree(const Image& image) : componentMapping(), nodes(),
-    root(0)
+ComponentTree::ComponentTree(const Image& image) : componentMapping(),root(0),
+    totalNodes(0)
 {
     // stores all the partial trees being made during component tree building
     DisjointSetCollection partialTrees;
@@ -91,13 +100,15 @@ ComponentTree::ComponentTree(const Image& image) : componentMapping(), nodes(),
 
     // stores the canonical element of each partial tree
     DisjointSetCollection canonicalElements;
+    NodeVector nodes;
 
     unsigned int totalPixels = image.getPixels().size();
+    totalNodes = totalPixels;
     for (unsigned int pixelPosition = 0; pixelPosition < totalPixels;
          pixelPosition++)
     {
         // create a node for each pixel
-        nodes.push_back(new Node(image.getPixels().at(pixelPosition)));
+        nodes.push_back(new Node(image.getPixels().at(pixelPosition) + 1));
 
         // initialize partial trees
         partialTreeRoot.push_back(pixelPosition);
@@ -105,79 +116,113 @@ ComponentTree::ComponentTree(const Image& image) : componentMapping(), nodes(),
         canonicalElements.addNewSet(pixelPosition);
     }
 
+    set<unsigned int> alreadyProcessed;
     vector<ushort> orderedPixels = SpecialSort(image.getPixels());
     for (auto& currentPixel : orderedPixels)
     {
+        // mark pixel as processed
+        alreadyProcessed.insert(currentPixel);
+
         // Get the partial tree the current pixel belongs to
         unsigned int currentPartialTree = partialTrees.find(currentPixel);
 
-        // Get the Node of the partial tree root current pixel belongs to
-        unsigned int currentNode = canonicalElements.find(partialTreeRoot.at(currentPartialTree));
+        // Get the root of that partial tree
+        unsigned int localRoot = partialTreeRoot.at(currentPartialTree);
+
+        // Get the node of that root
+        unsigned int currentNode = canonicalElements.find(localRoot);
 
         // Iterate neighbors with lowest grey level
         vector<unsigned int> neighbors = image.getLowerOrEqualNeighbors(currentPixel);
         for (auto& currentNeighbor :  neighbors)
         {
+            if (alreadyProcessed.find(currentNeighbor) == alreadyProcessed.end())
+            {
+                continue;
+            }
+
             // partial tree of the neighbor
             unsigned int neighborPartialTree = partialTrees.find(currentNeighbor);
 
-            // Get the Node of the partial tree root current pixeneighborl belongs to
-            unsigned int neighborNode = canonicalElements.
-                    find(partialTreeRoot.at(neighborPartialTree));
+            // Get the root of that partial tree
+            unsigned int localRoot = partialTreeRoot.at(neighborPartialTree);
 
+            // Get the node of that root
+            unsigned int neighborNode = canonicalElements.find(localRoot);
+
+            // If not already linked, we need to link them now.
             if (currentNode != neighborNode)
             {
-                // Not already linked. Link now.
                 if (nodes.at(currentNode)->getLevel() ==
                         nodes.at(neighborNode)->getLevel())
                 {
+                    /* Both nodes have the same level, so we need to delete one
+                      of them and set the parent of all childs (the ones from
+                      currentNode and the ones from the neighbor) one of them.
+                     */
                     unsigned int tempNode =
                             canonicalElements.linkSets(currentNode, neighborNode);
                     if (tempNode == currentNode)
                     {
+
                         nodes.at(currentNode)->addChilds
                                 (nodes.at(neighborNode)->getChilds());
+                        delete nodes.at(neighborNode);
+                        nodes.at(neighborNode) = nodes.at(currentNode);
                     }
                     else
                     {
                         nodes.at(neighborNode)->addChilds
                                 (nodes.at(currentNode)->getChilds());
+                        delete nodes.at(currentNode);
+                        nodes.at(currentNode) = nodes.at(neighborNode);
                     }
-                    delete nodes.at(neighborNode);
-                    nodes.at(neighborNode) = nodes.at(currentNode);
+
+                    totalNodes--;
+                    /* updating current node the be the canonical element after
+                     linking, to keep comparing with the other neighbors */
                     currentNode = tempNode;
                 }
                 else
                 {
-                    nodes.at(currentNode)->addChilds(nodes.at(neighborNode)->getChilds());
+                    // currentNode is the father of neighbor node
+                    nodes.at(currentNode)->addChilds(nodes.at(neighborNode));
                 }
+
+                /* both partial trees now should be linked, and the root of
+                   the new partial tree is the currentNode */
                 currentPartialTree = partialTrees.
                         linkSets(currentPartialTree,neighborPartialTree);
                 partialTreeRoot.at(currentPartialTree) = currentNode;
             }
         }
-
-        for (unsigned int pixelPosition = 0; pixelPosition < totalPixels;
-             pixelPosition++)
-        {
-            componentMapping[pixelPosition] = nodes.at(canonicalElements.find(pixelPosition));
-        }
-
-        Node* root = nodes.at(partialTreeRoot.at(partialTrees.find(canonicalElements.find(0))));
-        calculateEulerTour(root);
-        calculateRepresentatives(root);
     }
+
+    for (unsigned int pixelPosition = 0; pixelPosition < totalPixels;
+         pixelPosition++)
+    {
+        componentMapping[pixelPosition] = nodes.at(canonicalElements.find(pixelPosition));
+    }
+
+    // Lets get the root node of the tree.
+
+    // First get the canonical element of any pixel
+    unsigned int node = canonicalElements.find(0);
+
+    // Then get the partial tree of that canonical element
+    unsigned int partialt = partialTrees.find(node);
+
+    // Get the root of that partial tree
+    unsigned int rootIndex = partialTreeRoot.at(partialt);
+    root = nodes.at(rootIndex);
+
+    calculateEulerTour(root);
+    calculateRepresentatives(root);
 }
 
 ComponentTree::~ComponentTree()
 {
-    for(unsigned int i=0; i < nodes.size(); i++)
-    {
-        if (nodes.at(i))
-        {
-            delete nodes.at(i);
-        }
-    }
+    deleteTree(root);
 }
 
 Node* ComponentTree::getMinimum(const NodeVector& nodes) const

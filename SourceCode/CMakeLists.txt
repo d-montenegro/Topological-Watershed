@@ -29,4 +29,5 @@ if (test)
 
     add_subdirectory(${CMAKE_SOURCE_DIR}/ImageHandler/UnitTest)
     add_subdirectory(${CMAKE_SOURCE_DIR}/DisjointSetCollection/UnitTest)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/ComponentTree/UnitTest)
 endif()
