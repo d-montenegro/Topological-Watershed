@@ -1,26 +1,26 @@
 #ifndef __NODE_H_INCLUDED__
 #define __NODE_H_INCLUDED__
 
-#include <vector>
+#include <set>
 
 using namespace std;
 
 class Node;
-using NodeVector = vector<Node*>;
+using NodeSet = set<Node*>;
 
 class Node
 {
 public:
     Node(unsigned short l) : level(l), childs() {}
-    void addChilds(NodeVector nodes) { childs.insert(childs.end(), nodes.begin(), nodes.end()); }
-    void addChilds(Node* node) { childs.push_back(node); }
+    void addChilds(NodeSet nodes) { childs.insert(nodes.begin(),nodes.end()); }
+    void addChilds(Node* node) { childs.insert(node); }
 
     unsigned short getLevel() { return level; }
-    NodeVector getChilds() { return childs; }
+    NodeSet getChilds() { return childs; }
 
 private:
     const unsigned short level;
-    NodeVector childs;
+    NodeSet childs;
 };
 
 #endif // __NODE_H_INCLUDED__

@@ -89,8 +89,9 @@ void deleteTree(Node* root)
 /*
  * Constructor. Builds component tree
  */
-ComponentTree::ComponentTree(const Image& image) : componentMapping(),root(0),
-    totalNodes(0)
+ComponentTree::ComponentTree(const Image& image) : totalNodes(0),
+    componentMapping(),root(0)
+
 {
     // stores all the partial trees being made during component tree building
     DisjointSetCollection partialTrees;
@@ -100,7 +101,7 @@ ComponentTree::ComponentTree(const Image& image) : componentMapping(),root(0),
 
     // stores the canonical element of each partial tree
     DisjointSetCollection canonicalElements;
-    NodeVector nodes;
+    vector<Node*> nodes;
 
     unsigned int totalPixels = image.getPixels().size();
     totalNodes = totalPixels;
@@ -133,7 +134,7 @@ ComponentTree::ComponentTree(const Image& image) : componentMapping(),root(0),
         unsigned int currentNode = canonicalElements.find(localRoot);
 
         // Iterate neighbors with lowest grey level
-        vector<unsigned int> neighbors = image.getLowerOrEqualNeighbors(currentPixel);
+        set<unsigned int> neighbors = image.getLowerOrEqualNeighbors(currentPixel);
         for (auto& currentNeighbor :  neighbors)
         {
             if (alreadyProcessed.find(currentNeighbor) == alreadyProcessed.end())
@@ -225,14 +226,14 @@ ComponentTree::~ComponentTree()
     deleteTree(root);
 }
 
-Node* ComponentTree::getMinimum(const NodeVector& nodes) const
+Node* ComponentTree::getMinimum(const NodeSet& nodes) const
 {
     if (nodes.size() < 2)
     {
         throw invalid_argument
                 ("To calculate minumum we need at least two nodes");
     }
-    Node* minLevelNode = nodes.at(0);
+    Node* minLevelNode = *nodes.begin();
     for (auto& node: nodes)
     {
         if (node->getLevel() < minLevelNode->getLevel())
@@ -244,7 +245,7 @@ Node* ComponentTree::getMinimum(const NodeVector& nodes) const
     return minLevelNode;
 }
 
-Node* ComponentTree::getHighestFork(const NodeVector& nodes) const
+Node* ComponentTree::getHighestFork(const NodeSet& nodes) const
 {
     if (nodes.size() < 2)
     {

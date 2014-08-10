@@ -17,22 +17,22 @@ public:
      * Returns the indexes at pixels of the neighbors of the pixel at position
      * 'pixelPosition'.
      */
-    vector<unsigned int> getNeighbors(unsigned int pixelPosition) const;
+    set<unsigned int> getNeighbors(unsigned int pixelPosition) const;
 
     /*
      * Returns the indexes at pixels of the neighbors of the pixel at position
      * 'pixelPosition' which value is lower or equal than its value.
      */
-    vector<unsigned int> getLowerOrEqualNeighbors(unsigned int pixelPosition) const;
+    set<unsigned int> getLowerOrEqualNeighbors(unsigned int pixelPosition) const;
 
     /*
      * Returns the indexes at pixels of the neighbors of the pixel at position
      * 'pixelPosition' which value is lower than its value.
      */
-    vector<unsigned int> getLowerNeighbors(unsigned int pixelPosition) const;
+    set<unsigned int> getLowerNeighbors(unsigned int pixelPosition) const;
 
 private:
-    vector<unsigned int> getNeighbors(unsigned int pixelPosition,
+    set<unsigned int> getNeighbors(unsigned int pixelPosition,
                                       ushort maxValue) const;
 
 };

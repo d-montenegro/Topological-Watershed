@@ -100,43 +100,40 @@ TEST(ComponentTreeTest, checkComponentTree) {
     ASSERT_EQ(c9,root);
 
     ASSERT_EQ(2,c9->getChilds().size());
-    ASSERT_TRUE((c9->getChilds().at(0) == c7 && c9->getChilds().at(1) == c6) ||
-                (c9->getChilds().at(0) == c6 && c9->getChilds().at(1) == c7));
+    ASSERT_TRUE(c9->getChilds().find(c6) != c9->getChilds().end());
+    ASSERT_TRUE(c9->getChilds().find(c7) != c9->getChilds().end());
 
     ASSERT_EQ(0,c6->getChilds().size());
     ASSERT_EQ(3,c7->getChilds().size());
 
-    ASSERT_TRUE((c7->getChilds().at(0) == c2 && c7->getChilds().at(1) == c3 && c7->getChilds().at(2) == c5) ||
-                (c7->getChilds().at(0) == c2 && c7->getChilds().at(1) == c5 && c7->getChilds().at(2) == c3) ||
-                (c7->getChilds().at(0) == c3 && c7->getChilds().at(1) == c2 && c7->getChilds().at(2) == c5) ||
-                (c7->getChilds().at(0) == c3 && c7->getChilds().at(1) == c5 && c7->getChilds().at(2) == c2) ||
-                (c7->getChilds().at(0) == c5 && c7->getChilds().at(1) == c2 && c7->getChilds().at(2) == c3) ||
-                (c7->getChilds().at(0) == c5 && c7->getChilds().at(1) == c3 && c7->getChilds().at(2) == c2));
+    ASSERT_TRUE(c7->getChilds().find(c2) != c9->getChilds().end());
+    ASSERT_TRUE(c7->getChilds().find(c3) != c9->getChilds().end());
+    ASSERT_TRUE(c7->getChilds().find(c5) != c9->getChilds().end());
 
     ASSERT_EQ(0,c2->getChilds().size());
     ASSERT_EQ(0,c5->getChilds().size());
 
     ASSERT_EQ(1,c3->getChilds().size());
-    ASSERT_EQ(c1,c3->getChilds().at(0));
+    ASSERT_EQ(c1,*c3->getChilds().begin());
 
-    NodeVector c1Andc3 = {c1,c3};
+    NodeSet c1Andc3 = {c1,c3};
     ASSERT_EQ(0,tree.getHighestFork(c1Andc3));
 
-    NodeVector c2Andc3 = {c2,c3};
+    NodeSet c2Andc3 = {c2,c3};
     ASSERT_EQ(c7,tree.getHighestFork(c2Andc3));
 
-    NodeVector c3Andc5Andc6 = {c2,c3,c6};
+    NodeSet c3Andc5Andc6 = {c2,c3,c6};
     ASSERT_EQ(c9,tree.getHighestFork(c3Andc5Andc6));
 
-    NodeVector c1Andc5 = {c1,c5};
+    NodeSet c1Andc5 = {c1,c5};
     ASSERT_EQ(c7,tree.getHighestFork(c1Andc5));
 
-    NodeVector c1Andc9 = {c1,c9};
+    NodeSet c1Andc9 = {c1,c9};
     ASSERT_EQ(0,tree.getHighestFork(c1Andc9));
 
-    NodeVector allButc9 = {c1,c2,c3,c5,c6,c7};
+    NodeSet allButc9 = {c1,c2,c3,c5,c6,c7};
     ASSERT_EQ(c9,tree.getHighestFork(allButc9));
 
-    NodeVector allNodes = {c1,c2,c3,c5,c6,c7,c9};
+    NodeSet allNodes = {c1,c2,c3,c5,c6,c7,c9};
     ASSERT_EQ(c9,tree.getHighestFork(allNodes));
 }

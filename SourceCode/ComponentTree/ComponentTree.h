@@ -18,8 +18,8 @@ public:
     ComponentTree(const Image& image);
     ~ComponentTree();
 
-    Node* getMinimum(const NodeVector& nodes) const;
-    Node* getHighestFork(const NodeVector& nodes) const;
+    Node* getMinimum(const NodeSet& nodes) const;
+    Node* getHighestFork(const NodeSet& nodes) const;
 
     unsigned int getTotalNodes() const { return totalNodes; }
     Node* getRoot() const { return root; }

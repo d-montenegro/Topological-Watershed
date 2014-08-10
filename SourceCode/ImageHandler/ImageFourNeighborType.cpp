@@ -3,7 +3,7 @@
 
 using namespace std;
 
-vector<unsigned int> ImageFourNeighborType::getNeighbors(
+set<unsigned int> ImageFourNeighborType::getNeighbors(
         unsigned int pixelPosition) const
 {
     return getNeighbors(pixelPosition, numeric_limits<ushort>::max());
@@ -13,7 +13,7 @@ vector<unsigned int> ImageFourNeighborType::getNeighbors(
  * Returns the indexes at pixels of the neighbors of the pixel at position
  * 'pixelPosition' which value is lower or equal than its value.
  */
-vector<unsigned int> ImageFourNeighborType::getLowerOrEqualNeighbors(
+set<unsigned int> ImageFourNeighborType::getLowerOrEqualNeighbors(
         unsigned int pixelPosition) const
 {
     return getNeighbors(pixelPosition, pixels.at(pixelPosition));
@@ -23,17 +23,17 @@ vector<unsigned int> ImageFourNeighborType::getLowerOrEqualNeighbors(
  * Returns the indexes at pixels of the neighbors of the pixel at position
  * 'pixelPosition' which value is lower or equal than its value.
  */
-vector<unsigned int> ImageFourNeighborType::getLowerNeighbors(
+set<unsigned int> ImageFourNeighborType::getLowerNeighbors(
         unsigned int pixelPosition) const
 {
     return getNeighbors(pixelPosition, pixels.at(pixelPosition) - 1);
 }
 
-vector<unsigned int> ImageFourNeighborType::getNeighbors(
+set<unsigned int> ImageFourNeighborType::getNeighbors(
         unsigned int pixelPosition, ushort maxValue) const
 {
     ushort greyLevel = pixels.at(pixelPosition);
-    vector<unsigned int> neighbors;
+    set<unsigned int> neighbors;
 
 
     if (pixelPosition >= width)
@@ -41,7 +41,7 @@ vector<unsigned int> ImageFourNeighborType::getNeighbors(
         // I'm not in row 0, then I have a neighbour in the up row
         if (greyLevel <= maxValue)
         {
-            neighbors.push_back(pixelPosition - width);
+            neighbors.insert(pixelPosition - width);
         }
     }
 
@@ -50,7 +50,7 @@ vector<unsigned int> ImageFourNeighborType::getNeighbors(
         // I'm not last row, then I have a neighbour in the previous row
         if (greyLevel <= maxValue)
         {
-            neighbors.push_back(pixelPosition + width);
+            neighbors.insert(pixelPosition + width);
         }
     }
 
@@ -59,7 +59,7 @@ vector<unsigned int> ImageFourNeighborType::getNeighbors(
         // I'm not in the first column, then I have a neighbour on the left
         if (greyLevel <= maxValue)
         {
-            neighbors.push_back(pixelPosition - 1);
+            neighbors.insert(pixelPosition - 1);
         }
     }
 
@@ -68,7 +68,7 @@ vector<unsigned int> ImageFourNeighborType::getNeighbors(
         // I'm not in the last column, then I have a neighbour on the right
         if (greyLevel <= maxValue)
         {
-            neighbors.push_back(pixelPosition + 1);
+            neighbors.insert(pixelPosition + 1);
         }
     }
 

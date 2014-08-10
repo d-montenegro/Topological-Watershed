@@ -2,6 +2,7 @@
 #define __IMAGE_H_INCLUDED__
 
 #include <vector>
+#include <set>
 #include <limits>
 #include <stdexcept>
 
@@ -53,19 +54,19 @@ public:
      * Returns the indexes at pixels of the neighbors of the pixel at position
      * 'pixelPosition'.
      */
-    virtual vector<unsigned int> getNeighbors(unsigned int pixelPosition) const = 0;
+    virtual set<unsigned int> getNeighbors(unsigned int pixelPosition) const = 0;
 
     /*
      * Returns the indexes at pixels of the neighbors of the pixel at position
      * 'pixelPosition' which value is lower or equal than its value.
      */
-    virtual vector<unsigned int> getLowerOrEqualNeighbors(unsigned int pixelPosition) const = 0;
+    virtual set<unsigned int> getLowerOrEqualNeighbors(unsigned int pixelPosition) const = 0;
 
     /*
      * Returns the indexes at pixels of the neighbors of the pixel at position
      * 'pixelPosition' which value is lower than its value.
      */
-    virtual vector<unsigned int> getLowerNeighbors(unsigned int pixelPosition) const = 0;
+    virtual set<unsigned int> getLowerNeighbors(unsigned int pixelPosition) const = 0;
 
     vector<ushort> getPixels() const { return pixels; }
     unsigned int getWidth() const { return width; }

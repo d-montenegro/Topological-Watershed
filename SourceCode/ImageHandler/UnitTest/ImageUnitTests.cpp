@@ -10,7 +10,7 @@ TEST(ImageTest, checkNeighbors) {
     vector<unsigned short> dummyPixelArray = { 0,0,0,0,0,0,0,0,0 };
     ImageFourNeighborType image(dummyPixelArray,3,3);
 
-    vector<unsigned int> neighbors = image.getNeighbors(4);
+    set<unsigned int> neighbors = image.getNeighbors(4);
     ASSERT_EQ(4,neighbors.size());
     ASSERT_TRUE(std::find(neighbors.begin(), neighbors.end(), 1) != neighbors.end());
     ASSERT_TRUE(std::find(neighbors.begin(), neighbors.end(), 3) != neighbors.end());

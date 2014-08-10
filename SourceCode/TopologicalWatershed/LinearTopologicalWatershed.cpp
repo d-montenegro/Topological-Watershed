@@ -13,12 +13,16 @@ using namespace std;
 Node* wDestructible(const Image& image, const ComponentTree& componentTree,
                     const unsigned int pixelPosition)
 {
-    NodeVector nodesFromNeighbor;
+    NodeSet nodesFromNeighbor;
     ComponentMapping componentMapping = componentTree.getComponentMapping();
-    vector<unsigned int> neighbors = image.getLowerNeighbors(pixelPosition);
+    set<unsigned int> neighbors = image.getLowerNeighbors(pixelPosition);
+    if (0 == neighbors.size())
+    {
+        return 0;
+    }
     for (auto& neighbor : neighbors)
     {
-        nodesFromNeighbor.push_back(componentMapping.at(neighbor));
+        nodesFromNeighbor.insert(componentMapping.at(neighbor));
     }
 
     Node* highestFork = componentTree.getHighestFork(nodesFromNeighbor);
@@ -42,19 +46,20 @@ void doLinearTopologicalWatershed(Image& image)
     map<unsigned int, Node*> newComponent;
     ComponentTree componentTree(image);
     for (unsigned int currentPixel = 0; currentPixel < image.getPixels().size();
-         currentPixel ++)
+         currentPixel++)
     {
         Node* node = wDestructible(image,componentTree,currentPixel);
         if (node)
         {
-            priority[node->getLevel() - 1].push(currentPixel);
-            newGreyLevel[currentPixel] = node->getLevel() - 1;
+            cout << node->getLevel() << endl;
+            priority[node->getLevel()].push(currentPixel);
+            newGreyLevel[currentPixel] = node->getLevel();
             newComponent[currentPixel] = node;
         }
     }
 
     for (ushort k = image.getLowestGreyIntensity();
-         k < image.getHighestGreyIntensity(); k++)
+         k <= image.getHighestGreyIntensity(); k++)
     {
         while (!priority[k].empty())
         {
@@ -90,14 +95,27 @@ void doLinearTopologicalWatershed(Image& image)
 int main (void)
 {
     // Building Component Tree for dummy array
-    vector<unsigned short> dummyPixelArray = { 4,5,6,8,3,4,9,1,7,1,1,1 };
-    ImageFourNeighborType image(dummyPixelArray,3,4);
+    vector<unsigned short> dummyPixelArray = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                               0,1,2,11,11,11,4,4,3,3,0,5,11,11,11,3,2,0,
+                                               0,3,12,6,7,5,11,7,6,5,7,11,5,7,7,12,4,0,
+                                               0,15,7,4,2,3,5,11,11,11,11,5,3,1,7,7,15,0,
+                                               0,3,14,7,3,5,11,8,7,8,8,11,5,3,7,14,5,0,
+                                               0,1,2,13,11,11,3,2,2,1,2,4,11,11,11,4,3,0,
+                                               0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+
+    ImageFourNeighborType image(dummyPixelArray,18,7);
     doLinearTopologicalWatershed(image);
 
     for (unsigned int i = 0; i < image.getPixels().size(); i++)
     {
-        cout << image.getPixels().at(i) << endl;
+        if (0 == i % image.getWidth())
+        {
+            cout << endl;
+        }
+        cout << image.getPixels().at(i) << " ";
+
     }
+    cout << endl;
 
     return 0;
 }
