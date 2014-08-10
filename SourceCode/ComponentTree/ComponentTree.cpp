@@ -108,7 +108,7 @@ ComponentTree::ComponentTree(const Image& image) : componentMapping(),root(0),
          pixelPosition++)
     {
         // create a node for each pixel
-        nodes.push_back(new Node(image.getPixels().at(pixelPosition) + 1));
+        nodes.push_back(new Node(image.getPixels().at(pixelPosition)));
 
         // initialize partial trees
         partialTreeRoot.push_back(pixelPosition);
@@ -259,9 +259,10 @@ Node* ComponentTree::getHighestFork(const NodeVector& nodes) const
         if (node != minLevelNode)
         {
             Node* blca = getBinaryLeastCommonAncestor(node,highestFork);
-            if (blca != node)
+            if (blca && blca != node && blca != highestFork)
             {
-                highestFork = node;
+                // then they are separated
+                highestFork = blca;
             }
         }
     }
@@ -298,17 +299,17 @@ Node* ComponentTree::getBinaryLeastCommonAncestor(Node* node1, Node* node2) cons
         node2Representative = temp;
     }
 
-    ushort minorLevel = eulerTour.at(node1Representative)->getLevel();
+    Node* blca = eulerTour.at(node1Representative);
     for (unsigned int index = node1Representative + 1;
          index <= node2Representative; index++)
     {
-        if (eulerTour.at(index)->getLevel() < minorLevel)
+        if (eulerTour.at(index)->getLevel() > blca->getLevel())
         {
-            minorLevel = index;
+            blca = eulerTour.at(index);
         }
     }
 
-    return eulerTour.at(minorLevel);
+    return blca;
 }
 
 
