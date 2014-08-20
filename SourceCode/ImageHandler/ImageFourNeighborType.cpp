@@ -26,20 +26,21 @@ set<unsigned int> ImageFourNeighborType::getLowerOrEqualNeighbors(
 set<unsigned int> ImageFourNeighborType::getLowerNeighbors(
         unsigned int pixelPosition) const
 {
+    if (0 == pixels.at(pixelPosition))
+    {
+        return set<unsigned int>();
+    }
     return getNeighbors(pixelPosition, pixels.at(pixelPosition) - 1);
 }
 
 set<unsigned int> ImageFourNeighborType::getNeighbors(
         unsigned int pixelPosition, ushort maxValue) const
 {
-    ushort greyLevel = pixels.at(pixelPosition);
     set<unsigned int> neighbors;
-
-
     if (pixelPosition >= width)
     {
         // I'm not in row 0, then I have a neighbour in the up row
-        if (greyLevel <= maxValue)
+        if (pixels.at(pixelPosition - width) <= maxValue)
         {
             neighbors.insert(pixelPosition - width);
         }
@@ -48,7 +49,7 @@ set<unsigned int> ImageFourNeighborType::getNeighbors(
     if (pixelPosition < width * (height - 1))
     {
         // I'm not last row, then I have a neighbour in the previous row
-        if (greyLevel <= maxValue)
+        if (pixels.at(pixelPosition + width) <= maxValue)
         {
             neighbors.insert(pixelPosition + width);
         }
@@ -57,7 +58,7 @@ set<unsigned int> ImageFourNeighborType::getNeighbors(
     if (0 != pixelPosition % width)
     {
         // I'm not in the first column, then I have a neighbour on the left
-        if (greyLevel <= maxValue)
+        if (pixels.at(pixelPosition - 1) <= maxValue)
         {
             neighbors.insert(pixelPosition - 1);
         }
@@ -66,7 +67,7 @@ set<unsigned int> ImageFourNeighborType::getNeighbors(
     if (0 != (pixelPosition + 1) % width)
     {
         // I'm not in the last column, then I have a neighbour on the right
-        if (greyLevel <= maxValue)
+        if (pixels.at(pixelPosition + 1) <= maxValue)
         {
             neighbors.insert(pixelPosition + 1);
         }

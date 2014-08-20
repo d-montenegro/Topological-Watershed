@@ -73,6 +73,7 @@ public:
     unsigned int getHeight() const { return height; }
     ushort getLowestGreyIntensity() const { return lowestGreyIntensity; }
     ushort getHighestGreyIntensity() const { return highestGreyIntensity; }
+    void setPixelValue(unsigned int pixelPosition, ushort newGreyValue) { pixels.at(pixelPosition) = newGreyValue; }
 
 protected:
     vector<ushort> pixels;

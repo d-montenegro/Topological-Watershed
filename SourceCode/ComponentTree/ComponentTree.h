@@ -23,7 +23,7 @@ public:
 
     unsigned int getTotalNodes() const { return totalNodes; }
     Node* getRoot() const { return root; }
-    ComponentMapping getComponentMapping() const { return componentMapping; }
+    ComponentMapping& getComponentMapping() { return componentMapping; }
 
 private:
     Node* getBinaryLeastCommonAncestor(Node *node1, Node *node2) const;
