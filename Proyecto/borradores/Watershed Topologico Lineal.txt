@@ -1,0 +1,97 @@
+Lo que podría hacer para explicar el algoritmo es lo siguiente:
+
+Naive Topological Watershed
+
+Ver referencias del quasi-lineal
+
+Watershed Topológico Lineal
+
+Descripción
+
+primero, tengo que introducir la noción de component tree y explicar como
+calcularlo.
+Luego menciono el teorema 9, y finalmente menciono los detalles de
+implementación. (como la cola de prioridades). Finalmente, el pseudo-código
+
+<Ejemplos, muchos ejemplos>
+
+Implementación
+
+Acá voy a hacer un diagrama de clases para que quede claro como está
+implementado
+
+Conclusión
+
+Acá pongo los resultados, en términos de eficiencia, de correr el algoritmo
+
+
+Watershed Topológico Paralelo
+
+Este, tendría que estudiarlo bien -> Acá tengo que hacer foco ahora
+
+
+
+Anexos:
+
+Bueno, antes de ver el algoritmo de watershed topologico, vamos a pensar que en
+una sección previa, o en algún anexo están los siguientes contenidos:
+-) Qué es un grafo
+-) Como representar una imagen con un grafo con pesos
+-) Stacks (downstack y upstack)
+
+
+*)Topological notions for graphs (va a algun anexo)
+
+Sea E un conjunto finito, entonces con P(E) denotamos el conjunto de todos los
+subconjutos de E, y comúnmente se lo denomina "partes de E". Definimos con Γ
+una relación binaria en E, es decir, Γ ⊆ E × E, reflexiva (para todo p ∈ E,
+(p,p) ∈ Γ) y simétrica (si (p,q) ∈ Γ entonces (q,p) ∈ Γ).
+
+Un grafo G será un par (E,Γ), donde a los elementos de E se los conoce como
+vértices, nodos o puntos. También denotaremos con Γ: E -> P(E), donde Γ(p) = {q
+∈ E | (p,q) ∈ Γ}. Para cada punto p, el conjunto Γ(p) es llamado "vecindario"
+de p. Si q ∈ Γ(p), decimos que p y q son adjacentes, o que q es vecino de p.
+Además, si X ⊆ E y q es adyancente a algun p ⊆ X, entonces se dice que q es
+adyacente a X.
+
+
+
+
+Definición 1:
+
+Sea E un conjunto, sea X ⊆ E un sobconjunto y p ∈ X un elemento.
+Diremos que p es un border point para X si es adyacente al complemento de X
+Diremos que p es un inner point para X si p no es un border point para X
+Diremos que p es un separating point para X si p es adyacente a dos o más
+componentes conectadas del complemento de X
+Diremos que p es W-simple para X si p es adyacente a exactamente una componente
+conectada del complemento de X
+
+<Aca vienen conclusiones y ejemplos>
+
+Definición 3: Aca se define:
+la componente del complemento de F a nivel k, o k-componente del complemento
+de F
+el minimo de F
+C(p,F complemento)
+Γ− (p, F)
+
+<Aca vienen ejemplos>
+
+Definición 4: Se define para una k-seccion
+border point
+inner point
+separating point
+W-destrutible point
+
+<Ejemplos>
+
+Definición 5: Acá se define qué es el topological watershed
+
+
+
+
+
+
+
+
