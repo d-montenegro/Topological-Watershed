@@ -9,7 +9,44 @@ improvement...... bla bla bla ..... >
 <Dado que el algoritmo se basa en el árbol de componentes, primero
 introduciremos este concepto>
 
-4.1. Definiciones y Notaciones
+4.1. Definiciones previas
+
+En este apartado repasaremos algunas nociones básicas que se utilizarán en el
+desarrollo de este capítulo.
+
+Sea E con conjunto finito. Un grafo será un par (E,Γ), donde Γ es un mapeo de E
+a P(E) (denominado "partes de E"). Si x ∈ E, entonces Γ(x) será el conjunto de
+elementos de E que son adjancentes a x. Si x ∈ Γ(y), decimos que x es vecino de
+y.
+
+Sea (E,Γ) un grafo, X ⊆ E, y x0,xn ∈ X. 
+
+  *) Sean x0,xn ∈ X, un camino de x0 hacia xn en X es un conjunto ordenado
+(x0,x1,...,xn) de elementos de X, donde xi+1 ∈ Γ(xi) para i = 0,1,...,n-1.
+  *) Sean x,y ∈ X, decimos que x e y están conectados  Decimos que x e y están
+conectados en X si existe un camino de x hacia y en X.
+  *) Decimos que X está conectado si cada par de elementos de X están
+conectados en X.
+  *) Sea Y ⊆ E, Y es una componente conectada de X si Y ⊆ X, Y está conectado y
+Y es maximal.
+
+Un grafo con pesos será terna (E,Γ,F), donde (E,Γ) es un grafo, y F será un
+mapa de E -> Z. Si p ∈ E, entonces denominamos F(p) como el nivel de p.
+
+Sea (E,Γ,F) un grafo con pesos. Entonces definimos la sección de nivel k, o
+k-sección como F[k] = { p ∈ E : F(p) >= k }. Análogamente definimos F
+complemento[k] = { complemento F[k] } =  { p ∈ E : F(p) < k }.
+
+Una componente conectada de F complemento[k], será llamado una k-componente de
+F complemento.
+Una componente m de F complemento es un mínimo de F complemento (y también un
+mínimo de F) si no hay otra componente de F complemento incluida en m.
+Sea p ∈ E, k = F complemento(p), definimos como Ck(p) como la componente de F
+complemento[k] que contiene a p.
+Definimos Γ-(p) = { q ∈ Γ(p) : F(q) < F(p) }
+
+Un punto p es W-destructuble con valor mínimo v para F si para todo h : v < h
+<= F(p), p es W-destructible, y no es W-destructible para valor v. 
 
 4.2. Árbol de Componentes
 
@@ -167,8 +204,8 @@ una relación binaria en E, es decir, Γ ⊆ E × E, reflexiva (para todo p ∈ 
 (p,p) ∈ Γ) y simétrica (si (p,q) ∈ Γ entonces (q,p) ∈ Γ).
 
 Un grafo G será un par (E,Γ), donde a los elementos de E se los conoce como
-vértices, nodos o puntos. También denotaremos con Γ: E -> P(E), donde Γ(p) = {q
-∈ E | (p,q) ∈ Γ}. Para cada punto p, el conjunto Γ(p) es llamado "vecindario"
+vértices, nodos o puntos, y Γ: E -> P(E), donde Γ(p) = {q ∈ E | (p,q) ∈ Γ}. Para
+cada punto p, el conjunto Γ(p) es llamado "vecindario"
 de p. Si q ∈ Γ(p), decimos que p y q son adjacentes, o que q es vecino de p.
 Además, si X ⊆ E y q es adyancente a algun p ⊆ X, entonces se dice que q es
 adyacente a X.
