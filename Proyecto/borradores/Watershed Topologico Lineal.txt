@@ -1,17 +1,129 @@
-Lo que podría hacer para explicar el algoritmo es lo siguiente:
+4. Watershed Topológico Cuasi-lineal
 
-Naive Topological Watershed
+<Luego de ver los resultados del algoritmo fuerza bruta, vemos que es necesaria
+un
+improvement...... bla bla bla ..... >
 
-Ver referencias del quasi-lineal
+<En esta sección veremos un algoritmo propuesto por blablabla.... >
 
-Watershed Topológico Lineal
+<Dado que el algoritmo se basa en el árbol de componentes, primero
+introduciremos este concepto>
 
-Descripción
+4.1. Definiciones y Notaciones
 
-primero, tengo que introducir la noción de component tree y explicar como
-calcularlo.
-Luego menciono el teorema 9, y finalmente menciono los detalles de
-implementación. (como la cola de prioridades). Finalmente, el pseudo-código
+4.2. Árbol de Componentes
+
+<Acá puede venir una referencia de esto, que aplicaciones tiene, etc>
+
+4.2.1. Definión
+
+Para entender de un modo intuitivo qué es el árbol de componentes de una
+imgen, tenemos que imaginarla como un relive topográfico completamente
+sumergida en agua, a la que se le hacen perforaciones en sus mínimos. El nivel
+de agua irá decreciendo lentamente, y empezarán a verse islas (correspondientes
+a los máximos de la imagen), estas islas serán las hojas del árbol. A medida que
+el nivel de agua continue decreciendo, las islas irán creciendo, conformando lo
+que serán las ramas del árbol. Luego, a partir de algún nivel, puede que algunas
+islas se fusionen formando una sola pieza, estas piezas serán forks del árbol.
+El proceso terminará cuando toda el agua haya desaparecido.
+
+<imagen>
+
+De un modo más técnico, podemos definir el árbol de componentes como un árbol
+que cumple con estas dos propiedades:
+  *) los nodos son elementos de C(F)
+  *) habrá un arco de c' ∈ Ck(F) hacia la componente c ∈ Cj(F) si j = k+1 y c ⊆
+c'
+
+En este caso, se dice que c es hijo de c' y que c' es padre de c. Además, las
+componentes que no tiene hijos, se denominan hojas, mientras que las que no
+tienen padre, raíces.
+
+Junto al árbol de componentes, tendremeos también el denominado mapeo de
+componentes, que para cada pixel de nivel k de la imagen, asociará la
+componente que contiene a p en Ck(F).
+
+4.2.2. Ejemplos
+
+<Acá pueden venir un par de imágenes que muestren paso a paso cómo se calcula>
+
+4.3. Análisis teórico
+
+Cómo dijimos previamente, el algoritmo que presentaremos a continuación utiliza
+el Árbol de componentes de F complemento, al cual representaremos como C(F
+complemento). Del mismo modo, un par [k,c] representará un nodo del árbol,
+donde c ∈ Ck(F complemento). Llamaremos altura de [k,c] alnúmero k.
+
+Antes de explicar cómo se utiliza C(F complemento), necesitamos introducir las
+siguientes definiciones.
+
+  *) Decimos que [k1,c1] es ancestro de [k2,c2] si k2 ≤ k1 y c2 ⊆ c1. En este
+caso, también decimos que [k1,c1] está encima de [k2,c2] y que [k2,c2] está
+abajo de [k1,c1].
+
+  *) Decimos que [k,c] es ancestro común de [k1,c1],[k2,c2] si [k,c] es ancestro
+de [k1,c1] y [k,c] es ancestro de [k2,c2].
+
+  *) Decimos que [k,c] es el menor ancestro comun de [k1,c1],[k2,c2], si [k,c]
+es ancestro de comun de ambos y no hay ningún otro ancestro común abajo de
+[k,c].
+
+  *) Decimos que [k,c] es el menor ancestro común propio de [k1,c1],[k2,c2] si
+[k,c] es ancestro común de ambos y [k,c] es distinto de [k1,c1] y [k,c] es
+distinto de [k2,c2].
+
+  *) Decimos que [k1,c1],[k2,c2] están separadas si tienen menor ancestro común
+propio, caso contrario decimos que están linkeadas.
+
+  *) Decimos que [k,c] es highest fork de M = {[k1,c1],[k2,c2],......,[kn,cn]}
+si las siguientes condiciones se satisfacen:
+    *) Si [ki,ci],[kj,cj] están separados entonces el mínimo ancestro común
+tiene altura ≤ k.
+    *) existe [ki,ci],[kj,cj] elementos separados de M, tal que [k,c] es el
+mínimo ancestro común propio de [ki,ci],[kj,cj]. 
+
+En [1] se demuestra un teorema que establece que un punto p será W-destructible
+si y sólo si V(p) = {[F complemento(q),C(q)], q ∈ Γ− (p)} != ∅, y en este caso
+podemos diferenciar dos escenarios:
+  *) V(p) no tiene highest fork en C(F complemento), en este caso el lowest
+value de p será w-1, donde w denota el nivel del elemento más pequeño de V(p).
+  *) V(p) tiene highest fork en C(F complemento), si la altura de ese highest
+fork ≤ F(p), en este caso el lowest value será v-1.
+
+4.4. Implementación
+
+<Acá vendra un diagrama de clases del algoritmo implementado, junto un párrafo
+explicativo>
+
+<Existe un algoritmo de orden cuasi lineal hecho por bla bla basado que utiliza
+una estructura llamada conjuntos disjuntos>
+
+Conjuntos Disjuntos
+
+El problema de los conjuntos disjuntos consiste en mantener una colección Q de
+subconjuntos disjuntos, de un conjunto E. Cada conjunto X en Q será
+representado por un único elemento de X, llamando elemento canónico. Sean x e
+y dos elementos distintos de E, las operaciones que pueden hacerse sobre Q serán
+las siguientes:
+  *) MakeSet(x): agrega el conjunto {x} a Q.
+  *) Find(x): retorna el elemento canónico del conjunto al que pertenece x.
+  *) Link(x,y): sean X e Y dos conjuntos de Q con elemento canónico x e y
+respectivamente, entonces esta operación borrar ambos conjuntos de Q y agregará
+el conjunto Z = X ∪ Y, y retornará el elemento canónico de Z.
+
+Para comprender el papel de estas estructuras en el armado del "Árbol de
+Componentes", proporcionamos el siguiente pseudo-código que determina las
+componentes conectadas 
+
+
+
+
+
+
+
+Para poder explicar este algoritmo, primero debemos introducir el concepto de
+"Árbol de componentes".
+
 
 <Ejemplos, muchos ejemplos>
 
@@ -28,6 +140,13 @@ Acá pongo los resultados, en términos de eficiencia, de correr el algoritmo
 Watershed Topológico Paralelo
 
 Este, tendría que estudiarlo bien -> Acá tengo que hacer foco ahora
+
+
+Lo que podría hacer para explicar el algoritmo es lo siguiente:
+
+Naive Topological Watershed
+
+<Sacar data de las referencias del quasi-lineal>
 
 
 
