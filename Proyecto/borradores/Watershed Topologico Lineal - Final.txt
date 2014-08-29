@@ -3,29 +3,36 @@
 En [1] se propone  un algoritmo  de orden cuasi-lineal para el cálculo del
 Watershed Topológio de una imagen. Se logra esta notable diferencia de
 eficiencia con respecto al anterior a partir de dos factores. Por un lado, los
-pixeles se procesan de tal modo de asegurar que su valor se reducirá, a lo sumo,
-sólo una vez durante la ejecución del algritmo. Por el otro, se dismunye el
-valor de un pixel W-destructible no en 1, si no en el máximo valor posible.
-Esto último se logra gracias a la utilización de una estructura de datos llamada
-Árbol de Componentes, que introduciremos a continuación.
+pixeles se procesan siguiendo un orden de modo de asegurar que su valor se
+reducirá, a lo sumo, sólo una vez durante la ejecución del algritmo. Por el
+otro, se dismunye el valor de un pixel W-destructible no en 1, si no en el
+máximo valor posible. Esto último se logra gracias a la utilización de una
+estructura de datos llamada "Árbol de Componentes", que introduciremos a
+continuación.
 
-En este capítulo, primero repasaremos algunas nociones de grafos que serán
-útiles, luego explicaremos el Árbol de Componentes. Después explicaremos que rol
-del árbol de ocmponentes y finalmente explicaremos como se implementa el
-algoritmo.
+En este capítulo, repasaremos algunas nociones básicas que serán de utilidad
+para comprender el contenido de este capítulo. Luego se introducirá el concepto
+de Árbol de Componentes de una imagen, para después poder explicar el rol del
+mismo en el cálculo del Watershed Topológico de una imagen. Finalmente se dará
+un pseudo-código del algoritmo, con una explición linea a linea para evacuar
+cualquier duda a cerca del algoritmo en sí.
+
 
 4.1. Nociones previas
 
-Para un repaso de grafos, ver anexo 1.
+En este capítulo se utilizará la visión de la imagen como un grafo, para una
+referencia de representación ver sección 2.1, para repasar la noción de grafos
+ver anexo 1.
 
 Sea (E,Γ,F) un grafo con pesos. Denotamos con Kmin = min{ F(p) : p ∈ E }, Kmax
-= max{ F(p) : p ∈ E }. Sea k : Kmin <= k <= Kmax.
+= max{ F(p) : p ∈ E }. Sea k ∈ [Kmin,Kmax].
   *) Llamamos sección de nivel k, o k-sección a F[k] = { p ∈ E : F(p) >= k }.
   *) Llamamos k-componente (o simplemente componente) de F a una componente
 conectada de F[k].
   *) Una componente m de F será un mínimo de F si no hay otra componente de F
 incluida en m.
   *) Definimos Ck(F) como el conjunto de todas las k-componentes de F
+  *) Definimos C(F) = Uk=Kmin,Kmax Ck(F)
   *) Definimos Γ-(p) = { q ∈ Γ(p) : F(q) < F(p) }
 
 <ejemplo, imagen>
@@ -39,20 +46,21 @@ incluida en m.
 
 Para entender de un modo intuitivo qué es el árbol de componentes de una
 imgen, tenemos que imaginarla como un relive topográfico (ver sección
-2.1) completamente sumergida en agua, a la que se le hacen perforaciones en sus
-mínimos. El nivel de agua irá decreciendo lentamente, y empezarán a verse islas
-(correspondientes a los máximos de la imagen), estas islas serán las hojas del
-árbol. A medida que el nivel de agua continue decreciendo, las islas irán
-creciendo, conformando lo que serán las ramas del árbol. Luego, a partir de
-algún nivel, puede que algunas islas se fusionen formando una sola pieza, estas
-piezas serán forks del árbol. El proceso terminará cuando toda el agua haya
-desaparecido.
+2.2.) que se encuentra completamente sumergido en agua, a la que se le hacen
+perforaciones en sus mínimos. El nivel de agua irá decreciendo lentamente, y
+empezarán a verse islas (correspondientes a los máximos de la imagen), estas
+islas serán las hojas del árbol. A medida que el nivel de agua continue
+decreciendo, las islas irán creciendo, conformando lo que serán las ramas del
+árbol. Luego, a partir de algún nivel, puede que algunas islas se fusionen
+formando una sola pieza, estas piezas serán forks del árbol. El proceso
+terminará cuando toda el agua haya desaparecido.
 
 <imagen>
 
-Sea (E,Γ,F) un grafo con pesos. Podemos definir el árbol de componentes T(F)
-como un árbol que cumple con estas dos propiedades:
-  *) los nodos son elementos de C(F) = Uk=Kmin,Kmax Ck(F).
+Sea (E,Γ,F) un grafo con pesos, y sean k,j ∈ [Kmin,Kmax].
+Podemos definir el árbol de componentes T(F) de (E,Γ,F) como un árbol que cumple
+con estas dos propiedades:
+  *) los nodos son elementos de C(F)
   *) habrá un arco de c' ∈ Ck(F) hacia la componente c ∈ Cj(F) si j = k+1 y c ⊆
 c'
 
@@ -61,8 +69,8 @@ componentes que no tiene hijos, se denominan hojas, mientras que las que no
 tienen padre, raíces.
 
 Junto al árbol de componentes, tendremeos también el denominado mapeo de
-componentes, que para cada pixel de nivel k de la imagen, asociará la
-componente que contiene a p en Ck(F).
+componentes, que para cada elemento p ∈ E, asociará la componente que contiene a
+p en Ck(F), donde k = F(p)
 
 4.2.2. Ejemplos
 
