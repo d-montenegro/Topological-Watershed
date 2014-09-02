@@ -1,29 +1,27 @@
-\chap{Watershed Topológico Cuasi-Lineal}
+\chapter{Watershed Topológico Cuasi-Lineal}
 
-En [1] se propone  un algoritmo  de orden cuasi-lineal para el cálculo del
-Watershed Topológio de una imagen. Se logra esta notable diferencia de
-eficiencia con respecto al presentado en el capítulo anterior a partir de dos factores. Por un lado, los pixeles se procesan siguiendo un orden particular de modo de asegurar que su valor se
-reducirá, a lo sumo, sólo una vez durante toda la ejecución. Por el
-otro, se dismunye el valor de un pixel W-destructible no en 1, si no en el
-máximo valor posible. Esto último se logra gracias a la utilización de una
-estructura de datos llamada "Árbol de Componentes", que será introducida a continucación.
-En este capítulo repasaremos en primer lugar algunas definiciones básicas que se utlizarán en el presente apartado. Luego se introducirá el concepto de Árbol de Componentes de una imagen, para después pasar a explicar el rol del mismo en el cálculo del Watershed Topológico de una imagen. Finalmente se dará un pseudo-código del algoritmo, con una explición linea a linea para evacuar cualquier duda a cerca del algoritmo en sí.
+En [1] se propone  un algoritmo  de orden cuasi-lineal para el cálculo del Watershed Topológio de una imagen. Se logra esta notable eficiencia a partir de dos factores. Por un lado, los pixeles se procesan siguiendo un orden de modo de asegurar que su valor se reducirá, a lo sumo, sólo una vez durante toda la ejecución del algoritmo. Por el otro, se dismunye el valor de un pixel W-destructible no en 1, si no en el máximo valor posible. Esto último se logra gracias a la utilización de una estructura de datos llamada "Árbol de Componentes", que será introducida a continuación.
+
+En este capítulo repasaremos en primer lugar algunas definiciones básicas, luego se introducirá el concepto de Árbol de Componentes de una imagen, para después explicar el rol del mismo en el cálculo del Watershed Topológico. Finalmente se dará un pseudo-código junto a una explicación línea a línea, a fin de mostrar el procedimiento detalladamente.
 
 \section{Definiciones preliminares}
 
-En el presente capítulo se utilizará la representación de la imagen como un grafo con pesos, tal como se vio en la sección 2.1. A continuación se presentan definiciones claves para comprender las siguientes secciones.
+En el presente capítulo se utilizará la representación de la imagen como un grafo con pesos, tal como se vio en la sección 2.1. A continuación se presentan conceptos claves.
 
-Sea G = \(E,\Gamma,F\) un grafo con pesos, entonces definimos \(Kmin = min{ F(p) : p \in E } \), \(Kmax = max{ F(p) : p \in E }\), K = [Kmin,Kmax]. Sea \(k \in K\), \(p \in E\), entonces
- *) El conjunto de todos los vecinos de p con peso menor a p se denotará con \(\Gamma-(p)\), es decir, \(\Gamma-(p) = { q \in \Gamma(p) : F(q) < F(p) }\).
-  *) Una k-sección de F será el conjunto \(F[k] = { p \in E : F(p) >= k }\).
-  *) Una k-componente (o simplemente componente) de F será una componente conectada de F[k].
-  *) Un mínimo de F será una componente m de F que no incluya ninguna otra componente de G.
-  *) El conjunto de todas las k-componentes de F se denotará con Ck(F).
-  *) El conjunto de todas las componentes de F se denotará C(F), es decir, \( C(F) = Uk \in K Ck(F)\).
+Sea $(E,\Gamma,F)$ un grafo con pesos, entonces definimos $K_{min} = min\{F(p) : p \in E\}$, $K_{max} = max\{F(p) : p \in E \}$, $K = [K_{min},K_{max}]$. Sea $k \in K, p \in E$, entonces
+
+\begin{itemize}
+  \item El conjunto de todos los vecinos de p con peso menor a p se denotará con $\Gamma-(p)$, es decir, $\Gamma-(p) = \{ q \in \Gamma(p) : F(q) < F(p) \}$.
+  \item Una $\textbf{k-sección}$ de F será el conjunto $F[k] = \{ p \in E : F(p) \ge k \}$.
+  \item Una $\textbf{k-componente}$ (o simplemente componente) de F será una componente conectada de F[k].
+  \item Un $\textbf{mínimo}$ de F será una componente m de F que no incluya ninguna otra componente de F.
+  \item El conjunto de todas las k-componentes de F se denotará con $C_k(F)$.
+  \item El conjunto de todas las componentes de F se denotará C(F), es decir, \[ C(F) = \bigcup_{k=K_{min}}^{K_{max}}{C_k(F)} \]
+\end{itemize}
 
 En lo que a procesamiento de imágenes respecta, podemos ver los siguientes ejemplos:
 
-<Acá vendrán algunas imágenes que ilustren las definiciones anteriores>
+<Acá vendrán algunas imágenes que ilustren los conceptos anteriores>
 
 \section{Árbol de Componentes}
 
@@ -31,61 +29,48 @@ En lo que a procesamiento de imágenes respecta, podemos ver los siguientes ejem
 
 \subsection{Definión}
 
-Para entender de un modo intuitivo qué es el árbol de componentes de una
-imgen, tenemos que imaginarla como un relive topográfico (ver sección
-2.2.) que se encuentra completamente sumergido en agua, a la que se le hacen
-perforaciones en sus mínimos. El nivel de agua irá decreciendo lentamente, y
-empezarán a verse islas (correspondientes a los máximos de la imagen), estas
-islas serán las hojas del árbol. A medida que el nivel de agua continue
-decreciendo, las islas irán creciendo, conformando lo que serán las ramas del
-árbol. Luego, a partir de algún nivel, seguramente algunas islas se fusionarán
-conformando una sola pieza, estas piezas serán forks del árbol. El proceso
-terminará cuando toda el agua haya desaparecido.
+Imaginemos una imagen como un relive topográfico (ver sección 2.2.) completamente sumergido en agua, al que se le hacen perforaciones en sus mínimos. El nivel de agua irá disminuyendo lentamente, con lo que empezarán a observarse islas (correspondientes a los máximos de la imagen), estas confirmarán las hojas del árbol de componentes de la imagen. A medida que el nivel de agua continue descendiendo, las islas irán creciendo en tamaño, conformando lo que serán las ramas del árbol. Luego, a partir de algún nivel, algunas islas se fusionarán conformando una sola pieza, estas piezas serán forks del árbol. El proceso terminará cuando toda el agua haya desaparecido.
 
-<imagen>
+<Acá vendrán algunas imágenes que ilustren los conceptos anteriores>
 
-Ahora podemos dar la definición formal. Sea G = $E,\Gamma,F$ un grafo con pesos, y sean \(k,j \in K\). Entonces el árbol de componentes T(F) será un árbol cuyos nodos serán elementos de C(F). Habrá una arista de \(c' \in Ck(F)\) hacia la componente \(c \in Cj(F)\) si j = k+1 y \(c \subseteq c'\).
+Ahora daremos la definición formal. Sea $(E,\Gamma,F)$ un grafo con pesos, y sean $k,j \in K$. Entonces el $\textbf{Árbol de Componentes}$ T(F) será un árbol cuyos nodos serán elementos de C(F) y habrá una arista de $c' \in C_k(F)$ hacia la componente $c \in C_j(F)$ si j = k+1 y $c \subseteq c'$. El $\textbf{mapeo de componentes}$ será un mapa $\Psi será  : E  \to C(F) $,  donde que relaciona para cada $p \in E$ el nodo de T(F) que lo contiene.
 
-Sea G = \(E,\Gamma,F\), entonces se define el mapeo de componentes  \(\Psi : E  \to C(F) \),  tal que  \( \Psi(p) \) será el nodo de T(F) que contiene a p.
-
-<Acá viene un ejemplo de una imgen y su arbol, junto con el component mapping>
+<Acá viene un ejemplo de una imagen y su arbol, junto con el component mapping>
 
 \section{Análisis Teórico}
 
-Antes de explicar como utilizar el árbol de componentes en el cálculo de Watershed Topológico de una imgen, es necesario introducir algunas definiciones. Sea G = \(E,\Gamma,F\) un grafo. Vamos a denotar un nodo de T(F) como un par [k,c], que implica que \(c \in Ck(F)\), entonces
+Antes de explicar cómo utilizar el árbol de componentes en el cálculo de Watershed Topológico de una imgen, es necesario introducir algunas definiciones más. Sea $(E,\Gamma,F)$ un grafo. Vamos a denotar un nodo de T(F) como un par [k,c], donde $c \in Ck(F)$.
 
-  *) Se dice que [k1,c1] es ancestro de [k2,c2] si \(k2 \le k1\) y \(c2 \subseteq c1\). En este
-caso, también decimos que [k1,c1] está encima de [k2,c2] y que [k2,c2] está
-abajo de [k1,c1].
+Sea $(E,\Gamma,F)$ un grafo, y sean $[k,c], [k_1,c_1], [k_2,c_2], .... , [k_n,c_n]$ nodos de T(F), entonces
 
-  *) Se dice que [k,c] es ancestro común de [k1,c1],[k2,c2] si [k,c] es ancestro
-de [k1,c1] y [k,c] es ancestro de [k2,c2].
+\begin{itemize}
+  \item $[k_1,c_1]$ es $\textbf{ancestro}$ de $[k_2,c_2]$ si $k2 \le k1$ y $c2 \subseteq c1$. En este caso, también decimos que $[k_1,c_1]$ está encima de $[k_2,c_2]$ y que $[k_2,c_2]$ está abajo de $[k_1,c_1]$.
+  \item $[k,c]$ es $\textbf{ancestro común}$ de $[k_1,c_1]$,$[k_2,c_2]$ si [k,c] es ancestro de $[k_1,c_1]$ y [k,c] es ancestro de $[k_2,c_2]$.
+  \item $[k,c]$ es el $\textbf{menor ancestro comun}$ de $[k_1,c_1]$,$[k_2,c_2]$, si [k,c] es ancestro de comun de ambos y no hay ningún otro ancestro común abajo de [k,c].
+  \item $[k,c]$ es el $\textbf{menor ancestro común propio}$ de $[k_1,c_1]$,$[k_2,c_2]$ si [k,c] es ancestro común de ambos y [k,c] es distinto de $[k_1,c_1]$ y [k,c] es distinto de $[k_2,c_2]$.
+  \item $[k_1,c_1]$,$[k_2,c_2]$ están $\textbf{separados}$ si tienen menor ancestro común propio, caso contrario decimos que están linkeados.
+  \item $[k,c]$ es $\textbf{highest fork}$ de M = \{$[k_1,c_1]$,$[k_2,c_2]$,......,$[k_n,c_n]$\} si las siguientes condiciones se satisfacen:
+  \begin{itemize}
+    \item Si $[k_i,c_i]$,$[k_j,c_j]$ están separados entonces el mínimo ancestro común tiene altura $\le$ k.
+    \item Existen $[k_i,c_i]$,$[k_j,c_j]$ separados, tal que [k,c] es el mínimo ancestro común propio de $[k_i,c_i]$,$[k_j,c_j]$. 
+  \end{itemize}
+\end{itemize}
 
-  *) Se dice que [k,c] es el menor ancestro comun de [k1,c1],[k2,c2], si [k,c]
-es ancestro de comun de ambos y no hay ningún otro ancestro común abajo de
-[k,c].
-
-  *) Se dice que [k,c] es el menor ancestro común propio de [k1,c1],[k2,c2] si
-[k,c] es ancestro común de ambos y [k,c] es distinto de [k1,c1] y [k,c] es
-distinto de [k2,c2].
-
-  *) Se dice que [k1,c1],[k2,c2] están separadas si tienen menor ancestro común
-propio, caso contrario decimos que están linkeadas.
-
-  *) Se dice que [k,c] es highest fork de M = {[k1,c1],[k2,c2],......,[kn,cn]}
-si las siguientes condiciones se satisfacen:
-    *) Si [ki,ci],[kj,cj] están separados entonces el mínimo ancestro común
-tiene altura \(\le\) k.
-    *) existe [ki,ci],[kj,cj] elementos separados de M, tal que [k,c] es el
-mínimo ancestro común propio de [ki,ci],[kj,cj]. 
-
-Sea G = \(E,\Gamma,F\) un grafo, y sea \(k \in K\), entonces definimos F complemento(p) = F(p) + 1, y F complemento[k] = F[k] complemento = { \(p \in E\) | F(p) < k }
+Sea $(E,\Gamma,F)$ un grafo, y sea $k \in K$, entonces definimos $\overline{F}(p) = F(p) + 1$*(comentario a pie de páginal), y $\overline{F}[k] = \overline{F[k]} = \{ p \in E | F(p) < k \}$
  
 Con estas definiciones en mente, estamos en condiciones de explicar como utilizar el árbol de componentes para calcular Watershed Topológico.
 
-Sea  G = \(E,\Gamma,F\)  un grafo, sea \(p \in E\). Denotamos como V(p) = {[F complemento(q),C(q)], \(p \in \Gamma-(q)\)}. Entonces p será W-destructible si y sólo si alguna de las siguientes propiedades se cumplen: 
-  *) V(p) != \(\varnothing\) y V(p) no tiene highest fork en T(F complemento). En este caso el lowest value de p será w-1, donde w denota el nivel del elemento más pequeño de V(p).
-  *) V(p) != \(\varnothing\), V(p) tiene highest fork en T(F complemento) y la altura de ese highest fork \(\leq\) F(p), en este caso el lowest value será v-1.
+Sea  $(E,\Gamma,F)$  un grafo, sea $p \in E$. Denotamos como $V(p) = \{[\overline{F}(q),C(q)], q \in \Gamma-(p)\}$. Entonces p será W-destructible si y sólo si alguna de las siguientes propiedades se cumplen:
+\begin{itemize}
+  \item V(p) != $\emptyset$ y V(p) no tiene highest fork en $T(\overline{F})$. Sea w el mínimo nivel de V(p), entonces p será W-destructible para todos los valores $k: w \leq k \leq F(p)$, y no será W-destructible para valor w - 1.
+  \item V(p) != $\emptyset$, V(p) tiene highest fork en $T(\overline{F})$ y la altura de ese highest fork $\leq$ F(p), entonces p será W-destructible para todos los valores $k: w \leq k \leq F(p)$, y no será W-destructible para w - 1.
+\end{itemize}
+  
+Acabamos de ver cómo utilizar el árbol de componentes para determinar a que valor debemos disminuir un punto W-destructible. Ahora resta ver cómo podemos hacer para no seleccionar el mismo punto más de una vez. En [1] se demuestra que seleccionando los puntos que de manera de procesar primero aquellos que bajan su nivel más bajo, no se seleccionará de nuevo el mismo punto. Esta técnica comenzará disminuyendo el valor de los píxeles adyacentes a los mínimos (los cuales obviamente NO serán seleccionado dos veces) y luego seleccionar los pixeles que NO son adyancentes.
 
+  
 \section{Implementación}
 
+<Aquí viene una imagen del pseudo código, y una explicación linea a linea>
+
+\end{document}
