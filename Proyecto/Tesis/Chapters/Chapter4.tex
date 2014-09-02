@@ -33,15 +33,21 @@ Imaginemos una imagen como un relive topográfico (ver sección 2.2.) completame
 
 <Acá vendrán algunas imágenes que ilustren los conceptos anteriores>
 
-Ahora daremos la definición formal. Sea $(E,\Gamma,F)$ un grafo con pesos, y sean $k,j \in K$. Entonces el $\textbf{Árbol de Componentes}$ T(F) será un árbol cuyos nodos serán elementos de C(F) y habrá una arista de $c' \in C_k(F)$ hacia la componente $c \in C_j(F)$ si j = k+1 y $c \subseteq c'$. El $\textbf{mapeo de componentes}$ será un mapa $\Psi será  : E  \to C(F) $,  donde que relaciona para cada $p \in E$ el nodo de T(F) que lo contiene.
+Sea $(E,\Gamma,F)$ un grafo con pesos, y sean $k,j \in K$. Entonces el $\textbf{Árbol de Componentes}$ T(F) será un árbol cuyos nodos serán elementos de C(F) y habrá una arista de $c' \in C_k(F)$ hacia la componente $c \in C_j(F)$ si j = k+1 y $c \subseteq c'$. En este caso, decimos que c' es padre de c, y también que c es hijo de c'.
+
+El $\textbf{mapeo de componentes}$ será un mapa $\Psi: E \to C(F)$, que relaciona cada $p \in E$ con el nodo de T(F) que lo contiene.
+
+\subsection{Ejemplo}
 
 <Acá viene un ejemplo de una imagen y su arbol, junto con el component mapping>
 
-\section{Análisis Teórico}
+\section{Algoritmo}
 
-Antes de explicar cómo utilizar el árbol de componentes en el cálculo de Watershed Topológico de una imgen, es necesario introducir algunas definiciones más. Sea $(E,\Gamma,F)$ un grafo. Vamos a denotar un nodo de T(F) como un par [k,c], donde $c \in Ck(F)$.
+Para calcular el Watershed Topológico de $(E,\Gamma,F)$, vamos a calcular $T(\overline{F})$, donde $\overline{F}[k] = \overline{F[k]} = \{ p \in E : F(p) < k \}$ y $\overline{F}(p)$ = F(p) + 1 \footnote{Esto se desprende del concepto de stacks, para más información ver [1]}.
 
-Sea $(E,\Gamma,F)$ un grafo, y sean $[k,c], [k_1,c_1], [k_2,c_2], .... , [k_n,c_n]$ nodos de T(F), entonces
+Vamos a denotar un nodo de $T(\overline{F})$ como un par [k,c] cuando $c \in C_k(\overline{F})$, y llamaremos nivel del nodo al número k.
+
+Sea $(E,\Gamma,F)$ un grafo, y sean $[k,c], [k_1,c_1], [k_2,c_2], .... , [k_n,c_n]$ nodos de $T(\overline{F})$, entonces
 
 \begin{itemize}
   \item $[k_1,c_1]$ es $\textbf{ancestro}$ de $[k_2,c_2]$ si $k2 \le k1$ y $c2 \subseteq c1$. En este caso, también decimos que $[k_1,c_1]$ está encima de $[k_2,c_2]$ y que $[k_2,c_2]$ está abajo de $[k_1,c_1]$.
@@ -56,17 +62,18 @@ Sea $(E,\Gamma,F)$ un grafo, y sean $[k,c], [k_1,c_1], [k_2,c_2], .... , [k_n,c_
   \end{itemize}
 \end{itemize}
 
-Sea $(E,\Gamma,F)$ un grafo, y sea $k \in K$, entonces definimos $\overline{F}(p) = F(p) + 1$*(comentario a pie de páginal), y $\overline{F}[k] = \overline{F[k]} = \{ p \in E | F(p) < k \}$
  
 Con estas definiciones en mente, estamos en condiciones de explicar como utilizar el árbol de componentes para calcular Watershed Topológico.
 
-Sea  $(E,\Gamma,F)$  un grafo, sea $p \in E$. Denotamos como $V(p) = \{[\overline{F}(q),C(q)], q \in \Gamma-(p)\}$. Entonces p será W-destructible si y sólo si alguna de las siguientes propiedades se cumplen:
+Sea  $(E,\Gamma,F)$  un grafo, sea $p \in E$. Denotamos como $V(p) = \{[\overline{F}(q),C(q)], q \in \Gamma-(p)\}$. Entonces p tiene las siguientes propiedades:
 \begin{itemize}
-  \item V(p) != $\emptyset$ y V(p) no tiene highest fork en $T(\overline{F})$. Sea w el mínimo nivel de V(p), entonces p será W-destructible para todos los valores $k: w \leq k \leq F(p)$, y no será W-destructible para valor w - 1.
-  \item V(p) != $\emptyset$, V(p) tiene highest fork en $T(\overline{F})$ y la altura de ese highest fork $\leq$ F(p), entonces p será W-destructible para todos los valores $k: w \leq k \leq F(p)$, y no será W-destructible para w - 1.
+  \item Si V(p) $\neq \emptyset$ y V(p) no tiene highest fork en $T(\overline{F})$, entonces p será W-destructible para todos los valores $k: w \leq k \leq F(p)$, y no será W-destructible para valor w - 1, donde w es el mínimo nivel de V(p).
+  \item Si V(p) $\neq \emptyset$ y V(p) tiene highest fork en $T(\overline{F})$ con una altura $w \leq$ F(p), entonces p será W-destructible para todos los valores $k: w \leq k \leq F(p)$, y no será W-destructible para w - 1.
 \end{itemize}
   
-Acabamos de ver cómo utilizar el árbol de componentes para determinar a que valor debemos disminuir un punto W-destructible. Ahora resta ver cómo podemos hacer para no seleccionar el mismo punto más de una vez. En [1] se demuestra que seleccionando los puntos que de manera de procesar primero aquellos que bajan su nivel más bajo, no se seleccionará de nuevo el mismo punto. Esta técnica comenzará disminuyendo el valor de los píxeles adyacentes a los mínimos (los cuales obviamente NO serán seleccionado dos veces) y luego seleccionar los pixeles que NO son adyancentes.
+Acabamos de ver cómo utilizar el árbol de componentes para determinar a qué valor debemos disminuir un punto W-destructible. Ahora resta ver cómo evitar seleccionar el mismo punto más de una vez.
+
+En [1] se demuestra que seleccionando los puntos de modo de procesar en primera instancia aquellos que bajarán su nivel a un valor menor, no se seleccionará de nuevo el mismo punto. Esta técnica comenzará disminuyendo el valor de los píxeles adyacentes a los mínimos (los cuales obviamente NO serán seleccionados dos veces) y disminuirá todos aquiellos pixeles que formarán parte de los mínimos del Watershed Topológico de la imagn, y luego disminuirá aquellos pixeles W-destructibles que no formarán parte de los mínimos de la imagen resultante.
 
   
 \section{Implementación}
