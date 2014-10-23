@@ -1,4 +1,5 @@
 SourceCode/build
+SourceCode/bin
 *.user
 *.autosave
 *~
