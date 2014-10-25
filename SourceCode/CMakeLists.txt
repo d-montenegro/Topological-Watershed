@@ -23,10 +23,8 @@ add_subdirectory(ComponentTree)
 add_subdirectory(TopologicalWatershed)
 
 if (test)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/gtest-1.7.0)
     enable_testing()
-    include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-
+    find_package(GTest REQUIRED)
     add_subdirectory(${CMAKE_SOURCE_DIR}/ImageHandler/UnitTest)
     add_subdirectory(${CMAKE_SOURCE_DIR}/DisjointSetCollection/UnitTest)
     add_subdirectory(${CMAKE_SOURCE_DIR}/ComponentTree/UnitTest)

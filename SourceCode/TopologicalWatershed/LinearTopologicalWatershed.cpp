@@ -1,17 +1,68 @@
 #include <iostream>
-#include <string>
-#include <queue>
-#include <limits>
-
-#include <assert.h>
-
+#include <set>
 #include "Node.h"
 #include "ComponentTree.h"
 #include "ImageFourNeighborType.h"
+#include "WDestructibleElement.h"
 
+namespace
+{
+// UTILITIES
+
+/*
+ * Remove from elements an element by pixelPosition
+ */
+void removeIfExistsByPixelPosition(set<WDestructibleElement>& elements,
+                              unsigned int pixelPosition)
+{
+    WDestructibleElement elem(0,0);
+    for (auto& element : elements)
+    {
+        if (element.pixelPosition == pixelPosition)
+        {
+            elem = element;
+            break;
+        }
+    }
+
+    if (elem.futureNode != 0)
+    {
+        elements.erase(elem);
+    }
+}
+
+/*
+ * Insert or update an element by pixelPosition
+ */
+void addOrUpdate(set<WDestructibleElement>& elements,
+                 const WDestructibleElement& wDestructibleElement)
+{
+    bool found = false;
+    for (auto& element : elements)
+    {
+        if (element.pixelPosition == wDestructibleElement.pixelPosition)
+        {
+            element.futureNode = wDestructibleElement.futureNode;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        elements.insert(wDestructibleElement);
+    }
+}
+
+} // anonymous namespace
 
 using namespace std;
 
+/*
+ * Checks if the pixel at pixelPosition is wDestructible or not. If it is,
+ * the a pointer to the node this pixel should point to is returned, otherwise,
+ * 0 es returned.
+ */
 Node* wDestructible(const Image& image, ComponentTree& componentTree,
                     const unsigned int pixelPosition)
 {
@@ -49,63 +100,50 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
     return 0;
 }
 
-void doLinearTopologicalWatershed(Image& image)
+/*
+ * Performs the Topological Watershed in cuasi-lineal time
+ */
+void doLinearTopologicalWatershed(Image& image, ComponentTree componentTree)
 {
-    map<ushort, set<unsigned int> > priority;
-    map<unsigned int, ushort> newGreyLevel;
-    map<unsigned int, Node*> newComponent;
-    ComponentTree componentTree(image);
+    set<WDestructibleElement> wDestructibleElements;
     for (unsigned int currentPixel = 0; currentPixel < image.getPixels().size();
          currentPixel++)
     {
         Node* node = wDestructible(image,componentTree,currentPixel);
         if (node)
         {
-            ushort newLevel = node->getLevel() > 0 ? node->getLevel() - 1 : 0;
-            priority[newLevel].insert(currentPixel);
-            newGreyLevel[currentPixel] = newLevel;
-            newComponent[currentPixel] = node;
+            wDestructibleElements.insert(WDestructibleElement(currentPixel,node));
         }
     }
 
-    for (ushort k = image.getLowestGreyIntensity();
-         k <= image.getHighestGreyIntensity(); k++)
+    while(!wDestructibleElements.empty())
     {
-        while (!priority[k].empty())
+        WDestructibleElement element = *wDestructibleElements.begin();
+        wDestructibleElements.erase(wDestructibleElements.begin());
+        image.setPixelValue(element.pixelPosition,element.futureNode->getLevel() - 1);
+        componentTree.getComponentMapping().at(element.pixelPosition) = element.futureNode;
+
+        for (auto& neighbor : image.getNeighbors(element.pixelPosition))
         {
-            unsigned int pixelPosition = *priority[k].begin();
-            priority[k].erase(priority[k].begin());
-            if (newGreyLevel[pixelPosition] == k)
+            if (element.futureNode->getLevel() <= image.getPixels().at(neighbor))
             {
-                image.setPixelValue(pixelPosition,k);
-                componentTree.getComponentMapping().at(pixelPosition) = newComponent.at(pixelPosition);
-                assert(componentTree.getComponentMapping().at(pixelPosition) == newComponent.at(pixelPosition));
-                for (auto& neighbor : image.getNeighbors(pixelPosition))
+                Node* node = wDestructible(image,componentTree,neighbor);
+                if (!node)
                 {
-                    if (k < image.getPixels().at(neighbor))
-                    {
-                        Node* node = wDestructible(image,componentTree,neighbor);
-                        if (!node)
-                        {
-                            newGreyLevel[neighbor] = std::numeric_limits<ushort>::max();
-                        }
-                        else
-                        {
-                            ushort newLevel = node->getLevel() > 0 ? node->getLevel() - 1 : 0;
-                            if (newGreyLevel[neighbor] != newLevel)
-                            {
-                                priority[newLevel].insert(neighbor);
-                                newGreyLevel[neighbor] = newLevel;
-                                newComponent[neighbor] = node;
-                            }
-                        }
-                    }
+                    removeIfExistsByPixelPosition(wDestructibleElements, neighbor);
+                }
+                else
+                {
+                    addOrUpdate(wDestructibleElements, WDestructibleElement(neighbor, node));
                 }
             }
         }
     }
 }
 
+/*
+ * Local and temporary test for the lineal topological watershed functionality
+ */
 int main (void)
 {
     // Building Component Tree for dummy array
@@ -118,7 +156,8 @@ int main (void)
                                        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     ImageFourNeighborType image(dummyPixelArray,18,7);
-    doLinearTopologicalWatershed(image);
+
+    doLinearTopologicalWatershed(image, ComponentTree(image));
 
     for (unsigned int i = 0; i < image.getPixels().size(); i++)
     {
@@ -126,7 +165,10 @@ int main (void)
         {
             cout << endl;
         }
-        cout << image.getPixels().at(i) << " ";
+        if (image.getPixels().at(i) < 10)
+            cout << "0" << image.getPixels().at(i) << " ";
+        else
+            cout << image.getPixels().at(i) << " ";
 
     }
     cout << endl;

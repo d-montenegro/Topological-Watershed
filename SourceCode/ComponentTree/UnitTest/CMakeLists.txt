@@ -1,4 +1,4 @@
 add_executable(ComponentTreeTest ComponentTreeUnitTest.cpp)
-target_link_libraries(ComponentTreeTest gtest gtest_main ComponentTree)
+target_link_libraries(ComponentTreeTest pthread gtest gtest_main ComponentTree)
 
 add_test(NAME checkComponentTree COMMAND ComponentTreeTest)

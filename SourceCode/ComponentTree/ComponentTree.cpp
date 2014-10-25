@@ -109,7 +109,7 @@ ComponentTree::ComponentTree(const Image& image) : totalNodes(0),
          pixelPosition++)
     {
         // create a node for each pixel
-        nodes.push_back(new Node(image.getPixels().at(pixelPosition)));
+        nodes.push_back(new Node(image.getPixels().at(pixelPosition) + 1));
 
         // initialize partial trees
         partialTreeRoot.push_back(pixelPosition);

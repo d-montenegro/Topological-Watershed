@@ -1,4 +1,4 @@
 add_executable(DisjointSetCollectionTest DisjointSetCollectionTest.cpp)
-target_link_libraries(DisjointSetCollectionTest gtest gtest_main DisjointSetCollection)
+target_link_libraries(DisjointSetCollectionTest pthread gtest gtest_main DisjointSetCollection)
 
 add_test(NAME disjointSetCollection COMMAND DisjointSetCollectionTest)

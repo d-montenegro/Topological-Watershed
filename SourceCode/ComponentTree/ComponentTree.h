@@ -2,8 +2,7 @@
 #define __COMPONENTTREE_H_INCLUDED__
 
 #include <map>
-#include <string>
-#include <vector>
+#include <stdexcept>
 
 #include "Image.h"
 #include "Node.h"
@@ -16,6 +15,17 @@ class ComponentTree
 {
 public:
     ComponentTree(const Image& image);
+    ComponentTree(const ComponentTree&) : totalNodes(0), componentMapping(),
+        root(0)
+    {
+        throw std::runtime_error("Unimplemented yet!!");
+    }
+
+    ComponentTree& operator= (const ComponentTree&)
+    {
+        throw std::runtime_error("Unimplemented yet!!");
+    }
+
     ~ComponentTree();
 
     Node* getMinimum(const NodeSet& nodes) const;

@@ -7,7 +7,7 @@
 class DisjointSetCollectionTest : public ::testing::Test
 {
 protected:
-    DisjointSetCollectionTest()
+    DisjointSetCollectionTest() : collection()
     {
         collection.addNewSet(0);
         collection.addNewSet(1);
