@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
@@ -92,6 +91,12 @@ void deleteTree(Node* root)
 ComponentTree::ComponentTree(const Image& image) : totalNodes(0),
     componentMapping(),root(0)
 
+{
+    buildComponentTree(image);
+}
+
+// TODO: split this method in several ones
+void ComponentTree::buildComponentTree(const Image& image)
 {
     // stores all the partial trees being made during component tree building
     DisjointSetCollection partialTrees;

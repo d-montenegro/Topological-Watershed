@@ -36,6 +36,7 @@ public:
     ComponentMapping& getComponentMapping() { return componentMapping; }
 
 private:
+    void buildComponentTree(const Image& image);
     Node* getBinaryLeastCommonAncestor(Node *node1, Node *node2) const;
 
     unsigned int totalNodes;
