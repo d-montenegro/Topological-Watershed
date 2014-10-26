@@ -15,6 +15,7 @@ SET(CMAKE_CXX_FLAGS  "-Wall -Wextra -ansi -pedantic -Weffc++ -g -std=c++11")
 include_directories(${CMAKE_SOURCE_DIR}/DisjointSetCollection)
 include_directories(${CMAKE_SOURCE_DIR}/ImageHandler)
 include_directories(${CMAKE_SOURCE_DIR}/ComponentTree)
+include_directories(${CMAKE_SOURCE_DIR}/TopologicalWatershed)
 
 # include the subdirectory containing our libs
 add_subdirectory(ImageHandler)
@@ -28,4 +29,5 @@ if (test)
     add_subdirectory(${CMAKE_SOURCE_DIR}/ImageHandler/UnitTest)
     add_subdirectory(${CMAKE_SOURCE_DIR}/DisjointSetCollection/UnitTest)
     add_subdirectory(${CMAKE_SOURCE_DIR}/ComponentTree/UnitTest)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/TopologicalWatershed/UnitTest)
 endif()

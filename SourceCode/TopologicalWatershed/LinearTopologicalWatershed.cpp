@@ -1,9 +1,7 @@
-#include <iostream>
 #include <set>
 #include "Node.h"
-#include "ComponentTree.h"
-#include "ImageFourNeighborType.h"
 #include "WDestructibleElement.h"
+#include "LinearTopologicalWatershed.h"
 
 namespace
 {
@@ -103,7 +101,7 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
 /*
  * Performs the Topological Watershed in cuasi-lineal time
  */
-void doLinearTopologicalWatershed(Image& image, ComponentTree componentTree)
+void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
 {
     set<WDestructibleElement> wDestructibleElements;
     for (unsigned int currentPixel = 0; currentPixel < image.getPixels().size();
@@ -141,37 +139,3 @@ void doLinearTopologicalWatershed(Image& image, ComponentTree componentTree)
     }
 }
 
-/*
- * Local and temporary test for the lineal topological watershed functionality
- */
-int main (void)
-{
-    // Building Component Tree for dummy array
-    vector<ushort> dummyPixelArray = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                                       0,1,2,11,11,11,4,4,3,3,0,5,11,11,11,3,2,0,
-                                       0,3,12,6,7,5,11,7,6,5,7,11,5,7,7,12,4,0,
-                                       0,15,7,4,2,3,5,11,11,11,11,5,3,1,7,7,15,0,
-                                       0,3,14,7,3,5,11,8,7,8,8,11,5,3,7,14,5,0,
-                                       0,1,2,13,11,11,3,2,2,1,2,4,11,11,11,4,3,0,
-                                       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-
-    ImageFourNeighborType image(dummyPixelArray,18,7);
-
-    doLinearTopologicalWatershed(image, ComponentTree(image));
-
-    for (unsigned int i = 0; i < image.getPixels().size(); i++)
-    {
-        if (0 == i % image.getWidth())
-        {
-            cout << endl;
-        }
-        if (image.getPixels().at(i) < 10)
-            cout << "0" << image.getPixels().at(i) << " ";
-        else
-            cout << image.getPixels().at(i) << " ";
-
-    }
-    cout << endl;
-
-    return 0;
-}
