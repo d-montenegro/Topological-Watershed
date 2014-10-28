@@ -8,9 +8,9 @@ void readImage(const std::string& imagePath, const std::string& format,
                std::vector<ushort>& pixels, unsigned int& width,
                unsigned int& height);
 
-void buildImage(const std::string& destinationImagePath, const std::string& format,
-                const std::vector<ushort>& pixels, unsigned int& width,
-                unsigned int& height);
+void buildImage(const std::string& , const std::string& ,
+                const std::vector<ushort>& , unsigned int& ,
+                unsigned int& );
 
 #endif // __IMAGEREADER_H_INCLUDED__
 

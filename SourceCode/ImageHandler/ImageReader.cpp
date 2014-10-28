@@ -4,9 +4,9 @@
 #include <ImageReader.h>
 #include <stdexcept>
 
-void buildImage(const std::string& destinationImagePath, const std::string& format,
-                const std::vector<ushort>& pixels, unsigned int& width,
-                unsigned int& height)
+void buildImage(const std::string&, const std::string&,
+                const std::vector<ushort>&, unsigned int&,
+                unsigned int&)
 {
     throw std::runtime_error("Unimplemented yet!!");
 }
