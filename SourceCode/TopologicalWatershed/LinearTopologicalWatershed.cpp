@@ -34,16 +34,9 @@ void removeIfExistsByPixelPosition(set<WDestructibleElement>& elements,
 void addOrUpdate(set<WDestructibleElement>& elements,
                  const WDestructibleElement& wDestructibleElement)
 {
-    set<WDestructibleElement>::iterator it =
-            find(elements.begin(),elements.end(),wDestructibleElement);
-    if (it != elements.end())
-    {
-        it->futureNode = wDestructibleElement.futureNode;
-    }
-    else
-    {
-        elements.insert(wDestructibleElement);
-    }
+    removeIfExistsByPixelPosition(elements,wDestructibleElement.pixelPosition);
+
+    elements.insert(wDestructibleElement);
 }
 
 } // anonymous namespace
@@ -57,9 +50,94 @@ set<unsigned int> pendingBorderPoints;
 // global variable to be used by parallel topological watershed
 set<unsigned> pendingInnerPoints;
 
-/*******************************************************************************
-                   BEGIN LINEAL TOPOLOGICAL WATERSHED
-*******************************************************************************/
+
+Node* wDestructible(const Image& image, ComponentTree& componentTree,
+                    const unsigned int pixelPosition);
+
+void processWDestructibleElement(Image& image, ComponentTree& componentTree,
+                                 WDestructibleElement& element,
+                                 set<WDestructibleElement>& wDestructibleElements);
+
+set<WDestructibleElement> initializeSet(Image& image,
+                                        ComponentTree& componentTree,
+                                        const Tile& tile);
+
+vector<Tile> divideImageInTiles(Image&, ushort);
+
+void doTopologicalWatershedOnTile(Image& image,
+                                  ComponentTree& componentTree,
+                                  const Tile& tile);
+
+void doTopologicalWatershedOnBorder(Image& image,
+                                    ComponentTree& componentTree);
+
+
+/*
+ * Performs the Topological Watershed in cuasi-lineal time
+ */
+void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
+{
+    set<WDestructibleElement> wDestructibleElements;
+    for (unsigned int currentPixel = 0; currentPixel < image.getPixels().size();
+         currentPixel++)
+    {
+        Node* node = wDestructible(image,componentTree,currentPixel);
+        if (node)
+        {
+            wDestructibleElements.insert(WDestructibleElement(currentPixel,node));
+        }
+    }
+
+    while(!wDestructibleElements.empty())
+    {
+        WDestructibleElement element = *wDestructibleElements.begin();
+        wDestructibleElements.erase(wDestructibleElements.begin());
+        processWDestructibleElement(image,componentTree,element,wDestructibleElements);
+    }
+}
+
+/*
+ * Performs the Topological Watershed in parallel
+ */
+void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
+                                    ushort numberOfThreads)
+{
+    // TODO: check for possible values of number of threads!
+    vector<Tile>tiles = divideImageInTiles(image, numberOfThreads);
+    vector<thread> threadPool;
+    for(ushort i = 0; i < numberOfThreads; i++)
+    {
+        threadPool.push_back(thread(doTopologicalWatershedOnTile,ref(image),ref(componentTree),
+                                    ref(tiles.at(i))));
+    }
+
+    // wait for all threads to finish
+    for_each(threadPool.begin(),threadPool.end(),[](thread& t) { t.join(); } );
+
+    doTopologicalWatershedOnBorder(image,componentTree);
+
+    while(!pendingInnerPoints.empty())
+    {
+        threadPool.clear();
+        for(ushort i = 0; i < numberOfThreads; i++)
+        {
+            Tile intersection;
+            set_intersection(tiles.at(i).begin(),tiles.at(i).end(),
+                             pendingInnerPoints.begin(),pendingInnerPoints.end(),
+                             inserter(intersection,intersection.begin()));
+            threadPool.push_back(thread(doTopologicalWatershedOnTile,ref(image),
+                                        ref(componentTree), ref(intersection)));
+        }
+
+        // wait for all threads to finish
+        for_each(threadPool.begin(),threadPool.end(),[](thread& t) { t.join(); } );
+
+        doTopologicalWatershedOnBorder(image,componentTree);
+    }
+}
+
+
+
 /*
  * Checks if the pixel at pixelPosition is wDestructible or not. If it is,
  * the a pointer to the node this pixel should point to is returned, otherwise,
@@ -125,34 +203,6 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
         }
     }
 }
-
-/*
- * Performs the Topological Watershed in cuasi-lineal time
- */
-void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
-{
-    set<WDestructibleElement> wDestructibleElements;
-    for (unsigned int currentPixel = 0; currentPixel < image.getPixels().size();
-         currentPixel++)
-    {
-        Node* node = wDestructible(image,componentTree,currentPixel);
-        if (node)
-        {
-            wDestructibleElements.insert(WDestructibleElement(currentPixel,node));
-        }
-    }
-
-    while(!wDestructibleElements.empty())
-    {
-        WDestructibleElement element = *wDestructibleElements.begin();
-        wDestructibleElements.erase(wDestructibleElements.begin());
-        processWDestructibleElement(image,componentTree,element,wDestructibleElements);
-    }
-}
-
-/*******************************************************************************
-                   BEGIN PARALLEL TOPOLOGICAL WATERSHED
-*******************************************************************************/
 
 set<WDestructibleElement> initializeSet(Image& image,
                                         ComponentTree& componentTree,
@@ -242,18 +292,4 @@ vector<Tile> divideImageInTiles(Image&, ushort)
     return vector<Tile>();
 }
 
-void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
-                                    ushort numberOfThreads)
-{
-    // TODO: check for possible values of number of threads!
-    vector<Tile>tiles = divideImageInTiles(image, numberOfThreads);
-    vector<thread> threadPool;
-    for(ushort i = 0; i < numberOfThreads; i++)
-    {
-        threadPool.push_back(thread(doTopologicalWatershedOnTile,ref(image),ref(componentTree),
-                                    ref(tiles.at(i))));
-    }
-
-    for_each(threadPool.begin(),threadPool.end(),[](thread& t) { t.join(); } );
-}
 
