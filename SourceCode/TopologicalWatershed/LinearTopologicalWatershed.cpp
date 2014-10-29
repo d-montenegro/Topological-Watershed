@@ -1,4 +1,7 @@
 #include <set>
+#include <vector>
+#include <algorithm>
+#include <thread>
 #include "Node.h"
 #include "WDestructibleElement.h"
 #include "LinearTopologicalWatershed.h"
@@ -13,19 +16,15 @@ namespace
 void removeIfExistsByPixelPosition(set<WDestructibleElement>& elements,
                               unsigned int pixelPosition)
 {
-    WDestructibleElement elem(0,0);
-    for (auto& element : elements)
+    set<WDestructibleElement>::iterator it =
+            find_if(elements.begin(),elements.end(),
+            [&](const WDestructibleElement& e)
+            {
+                return e.pixelPosition == pixelPosition;
+            });
+    if (it != elements.end())
     {
-        if (element.pixelPosition == pixelPosition)
-        {
-            elem = element;
-            break;
-        }
-    }
-
-    if (elem.futureNode != 0)
-    {
-        elements.erase(elem);
+        elements.erase(it);
     }
 }
 
@@ -35,18 +34,13 @@ void removeIfExistsByPixelPosition(set<WDestructibleElement>& elements,
 void addOrUpdate(set<WDestructibleElement>& elements,
                  const WDestructibleElement& wDestructibleElement)
 {
-    bool found = false;
-    for (auto& element : elements)
+    set<WDestructibleElement>::iterator it =
+            find(elements.begin(),elements.end(),wDestructibleElement);
+    if (it != elements.end())
     {
-        if (element.pixelPosition == wDestructibleElement.pixelPosition)
-        {
-            element.futureNode = wDestructibleElement.futureNode;
-            found = true;
-            break;
-        }
+        it->futureNode = wDestructibleElement.futureNode;
     }
-
-    if (!found)
+    else
     {
         elements.insert(wDestructibleElement);
     }
@@ -54,8 +48,18 @@ void addOrUpdate(set<WDestructibleElement>& elements,
 
 } // anonymous namespace
 
+using Tile = set<unsigned int>;
 using namespace std;
 
+// global variable to be used by parallel topological watershed
+set<unsigned int> pendingBorderPoints;
+
+// global variable to be used by parallel topological watershed
+set<unsigned> pendingInnerPoints;
+
+/*******************************************************************************
+                   BEGIN LINEAL TOPOLOGICAL WATERSHED
+*******************************************************************************/
 /*
  * Checks if the pixel at pixelPosition is wDestructible or not. If it is,
  * the a pointer to the node this pixel should point to is returned, otherwise,
@@ -98,6 +102,30 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
     return 0;
 }
 
+void processWDestructibleElement(Image& image, ComponentTree& componentTree,
+                                 WDestructibleElement& element,
+                                 set<WDestructibleElement>& wDestructibleElements)
+{
+    image.setPixelValue(element.pixelPosition,element.futureNode->getLevel() - 1);
+    componentTree.getComponentMapping().at(element.pixelPosition) = element.futureNode;
+
+    for (auto& neighbor : image.getNeighbors(element.pixelPosition))
+    {
+        if (element.futureNode->getLevel() <= image.getPixels().at(neighbor))
+        {
+            Node* node = wDestructible(image,componentTree,neighbor);
+            if (!node)
+            {
+                removeIfExistsByPixelPosition(wDestructibleElements, neighbor);
+            }
+            else
+            {
+                addOrUpdate(wDestructibleElements, WDestructibleElement(neighbor, node));
+            }
+        }
+    }
+}
+
 /*
  * Performs the Topological Watershed in cuasi-lineal time
  */
@@ -118,6 +146,62 @@ void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
     {
         WDestructibleElement element = *wDestructibleElements.begin();
         wDestructibleElements.erase(wDestructibleElements.begin());
+        processWDestructibleElement(image,componentTree,element,wDestructibleElements);
+    }
+}
+
+/*******************************************************************************
+                   BEGIN PARALLEL TOPOLOGICAL WATERSHED
+*******************************************************************************/
+
+set<WDestructibleElement> initializeSet(Image& image,
+                                        ComponentTree& componentTree,
+                                        const Tile& tile)
+{
+    set<WDestructibleElement> elements;
+    for (auto point : tile)
+    {
+        Node* node = wDestructible(image,componentTree,point);
+        if (node)
+        {
+            elements.insert(WDestructibleElement(point,node));
+        }
+    }
+
+    return elements;
+}
+
+void doTopologicalWatershedOnTile(Image& image,
+                                  ComponentTree& componentTree,
+                                  const Tile& tile)
+{
+    set<WDestructibleElement> elements = initializeSet(image,componentTree,tile);
+    while(!elements.empty())
+    {
+        WDestructibleElement element = *elements.begin();
+        elements.erase(elements.begin());
+        set<unsigned int> neighbors = image.getNeighbors(element.pixelPosition);
+        if (includes(tile.begin(),tile.end(),neighbors.begin(),neighbors.end()))
+        {
+            pendingBorderPoints.insert(element.pixelPosition);
+        }
+        else
+        {
+            processWDestructibleElement(image,componentTree,element,elements);
+        }
+    }
+}
+
+void doTopologicalWatershedOnBorder(Image& image,
+                                    ComponentTree& componentTree)
+{
+    set<WDestructibleElement> elements = initializeSet(image,componentTree,
+                                                       pendingBorderPoints);
+    while(!elements.empty())
+    {
+        WDestructibleElement element = *elements.begin();
+        elements.erase(elements.begin());
+
         image.setPixelValue(element.pixelPosition,element.futureNode->getLevel() - 1);
         componentTree.getComponentMapping().at(element.pixelPosition) = element.futureNode;
 
@@ -128,14 +212,48 @@ void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
                 Node* node = wDestructible(image,componentTree,neighbor);
                 if (!node)
                 {
-                    removeIfExistsByPixelPosition(wDestructibleElements, neighbor);
+                    removeIfExistsByPixelPosition(elements, neighbor);
+                    pendingInnerPoints.erase(neighbor);
                 }
                 else
                 {
-                    addOrUpdate(wDestructibleElements, WDestructibleElement(neighbor, node));
+                    set<WDestructibleElement>::iterator it =
+                            find_if(elements.begin(),elements.end(),
+                            [&](const WDestructibleElement& e)
+                            {
+                                return e.pixelPosition == neighbor;
+                            });
+                    if(it != elements.end())
+                    {
+                        it->futureNode = node;
+                    }
+                    else
+                    {
+                        pendingInnerPoints.insert(neighbor);
+                    }
                 }
             }
         }
     }
+}
+
+vector<Tile> divideImageInTiles(Image&, ushort)
+{
+    return vector<Tile>();
+}
+
+void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
+                                    ushort numberOfThreads)
+{
+    // TODO: check for possible values of number of threads!
+    vector<Tile>tiles = divideImageInTiles(image, numberOfThreads);
+    vector<thread> threadPool;
+    for(ushort i = 0; i < numberOfThreads; i++)
+    {
+        threadPool.push_back(thread(doTopologicalWatershedOnTile,ref(image),ref(componentTree),
+                                    ref(tiles.at(i))));
+    }
+
+    for_each(threadPool.begin(),threadPool.end(),[](thread& t) { t.join(); } );
 }
 

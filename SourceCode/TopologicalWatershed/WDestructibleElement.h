@@ -11,6 +11,8 @@ struct WDestructibleElement
     WDestructibleElement(unsigned int pixelPosition, Node* node) :
         pixelPosition(pixelPosition), futureNode(node) {}
 
+    bool operator== (const WDestructibleElement& e) const;
+
     bool operator< (const WDestructibleElement& e) const;
 
     WDestructibleElement& operator= (const WDestructibleElement& e);
@@ -31,6 +33,11 @@ bool WDestructibleElement::operator< (const WDestructibleElement& e) const
     }
 }
 
+bool WDestructibleElement::operator== (const WDestructibleElement& e) const
+{
+
+    return pixelPosition == e.pixelPosition;
+}
 
 WDestructibleElement& WDestructibleElement::operator=
     (const WDestructibleElement& e)
