@@ -5,6 +5,9 @@
 #include "Node.h"
 #include "WDestructibleElement.h"
 #include "LinearTopologicalWatershed.h"
+#include "BidimiensionalArrayPartitioner.h"
+
+using namespace std;
 
 namespace
 {
@@ -40,9 +43,6 @@ void addOrUpdate(set<WDestructibleElement>& elements,
 }
 
 } // anonymous namespace
-
-using Tile = set<unsigned int>;
-using namespace std;
 
 // global variable to be used by parallel topological watershed
 set<unsigned int> pendingBorderPoints;
@@ -103,12 +103,13 @@ void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
                                     ushort numberOfThreads)
 {
     // TODO: check for possible values of number of threads!
-    vector<Tile>tiles = divideImageInTiles(image, numberOfThreads);
+    vector<Tile>tiles = divideSquareIntoTiles(image.getWidth(),image.getHeight(),
+                                              numberOfThreads);
     vector<thread> threadPool;
     for(ushort i = 0; i < numberOfThreads; i++)
     {
-        threadPool.push_back(thread(doTopologicalWatershedOnTile,ref(image),ref(componentTree),
-                                    ref(tiles.at(i))));
+        threadPool.push_back(thread(doTopologicalWatershedOnTile,ref(image),
+                                    ref(componentTree),ref(tiles.at(i))));
     }
 
     // wait for all threads to finish
@@ -118,6 +119,7 @@ void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
 
     while(!pendingInnerPoints.empty())
     {
+        pendingBorderPoints.clear();
         threadPool.clear();
         for(ushort i = 0; i < numberOfThreads; i++)
         {
@@ -129,14 +131,13 @@ void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
                                         ref(componentTree), ref(intersection)));
         }
 
+        pendingInnerPoints.clear();
         // wait for all threads to finish
         for_each(threadPool.begin(),threadPool.end(),[](thread& t) { t.join(); } );
 
         doTopologicalWatershedOnBorder(image,componentTree);
     }
 }
-
-
 
 /*
  * Checks if the pixel at pixelPosition is wDestructible or not. If it is,
@@ -286,10 +287,3 @@ void doTopologicalWatershedOnBorder(Image& image,
         }
     }
 }
-
-vector<Tile> divideImageInTiles(Image&, ushort)
-{
-    return vector<Tile>();
-}
-
-

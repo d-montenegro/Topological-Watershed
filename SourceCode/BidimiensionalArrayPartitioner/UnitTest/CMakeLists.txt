@@ -1,0 +1,4 @@
+add_executable(BidimiensionalArrayPartitionerTest BidimiensionalArrayPartitionerTest.cpp)
+target_link_libraries(BidimiensionalArrayPartitionerTest pthread gtest gtest_main BidimiensionalArrayPartitioner)
+
+add_test(NAME bidimiensionalArrayPartitioner COMMAND BidimiensionalArrayPartitionerTest)

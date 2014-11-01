@@ -1,2 +1,3 @@
 add_library(TopologicalWatershed LinearTopologicalWatershed.cpp)
-target_link_libraries(TopologicalWatershed ImageFourNeighborType ComponentTree ImageReader)
+target_link_libraries(TopologicalWatershed ImageFourNeighborType ComponentTree
+ImageReader BidimiensionalArrayPartitioner)
