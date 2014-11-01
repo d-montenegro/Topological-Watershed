@@ -1,6 +1,7 @@
 #ifndef __IMAGE_H_INCLUDED__
 #define __IMAGE_H_INCLUDED__
 
+#include <iostream>
 #include <vector>
 #include <set>
 #include <limits>
@@ -67,6 +68,18 @@ public:
      * 'pixelPosition' which value is lower than its value.
      */
     virtual set<unsigned int> getLowerNeighbors(unsigned int pixelPosition) const = 0;
+
+    void printMe()
+    {
+        for(unsigned int index = 0; index < pixels.size(); index++)
+        {
+            if(index != 0 && index % width == 0)
+                cout << endl;
+            if(pixels.at(index) < 10)
+                cout << 0;
+            cout << pixels.at(index) << " ";
+        }
+    }
 
     vector<ushort> getPixels() const { return pixels; }
     unsigned int getWidth() const { return width; }

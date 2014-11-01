@@ -48,5 +48,11 @@ TEST(ParallelTopologicalWatershed, performParallelTopologicalWatershedOnSyntetic
                                       0,0,0,11,11,11,0,0,0,0,0,0,11,11,11,0,0,0,
                                       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
+    if(expectedResult != image.getPixels())
+    {
+        image.printMe();
+        cout << endl;
+    }
+
     ASSERT_EQ(expectedResult,image.getPixels());
 }
