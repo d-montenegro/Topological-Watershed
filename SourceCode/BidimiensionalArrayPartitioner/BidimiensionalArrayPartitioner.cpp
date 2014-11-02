@@ -3,20 +3,58 @@
 
 using namespace std;
 
+unsigned int specialRound(float number)
+{
+    unsigned int numberToInteger = number;
+    if(number - numberToInteger <= 0.5)
+    {
+        return numberToInteger;
+    }
+    return numberToInteger + 1;
+}
+
+void getDivisors(unsigned int n, unsigned int& min, unsigned int& max)
+{
+    unsigned int squareRoot = sqrt(n);
+    for(unsigned int i = squareRoot; i > 0; i++)
+    {
+        if(n % i == 0)
+        {
+            min = i;
+            max = n / i;
+            break;
+        }
+    }
+    return;
+}
+
 vector<Tile> divideSquareIntoTiles(unsigned int squareWidth,
                                    unsigned int squareHeight,
                                    unsigned int numberOfTiles)
 {
     vector<Tile> tiles(numberOfTiles);
+    unsigned int minDivisor = 0, maxDivisor = 0;
+    getDivisors(numberOfTiles,minDivisor,maxDivisor);
 
-    // number of elements in a row of a partition
-    unsigned int partitionWidth = round(squareWidth / sqrt(numberOfTiles));
-    // number of elements in a column of a partition
-    unsigned int partitionHeight = round(squareHeight / sqrt(numberOfTiles));
-    // number of partitions in a row
-    unsigned int totalWidthPartitions = round((float)squareWidth / (float)partitionWidth);
-    // number of partitions in a column
-    unsigned int totalHeightPartitions = round((float)squareHeight / (float)partitionHeight);
+    unsigned int partitionWidth = 0, // number of elements in a row of a partition
+            partitionHeight = 0, // number of elements in a column of a partition
+            totalWidthPartitions = 0, // number of partitions in a row
+            totalHeightPartitions = 0; // number of partitions in a column
+
+    if(squareWidth >= squareHeight)
+    {
+        partitionWidth = specialRound((float)squareWidth / (float)maxDivisor);
+        partitionHeight = specialRound((float)squareHeight / (float)minDivisor);
+        totalWidthPartitions = maxDivisor;
+        totalHeightPartitions = minDivisor;
+    }
+    else
+    {
+        partitionWidth = specialRound((float)squareWidth / (float)minDivisor);
+        partitionHeight = specialRound((float)squareHeight / (float)maxDivisor);
+        totalWidthPartitions = minDivisor;
+        totalHeightPartitions = maxDivisor;
+    }
 
     unsigned int currentTile = 0;
     unsigned int counter = 1;
