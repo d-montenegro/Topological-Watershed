@@ -16,7 +16,7 @@ unsigned int specialRound(float number)
 void getDivisors(unsigned int n, unsigned int& min, unsigned int& max)
 {
     unsigned int squareRoot = sqrt(n);
-    for(unsigned int i = squareRoot; i > 0; i++)
+    for(unsigned int i = squareRoot; i > 0; i--)
     {
         if(n % i == 0)
         {
