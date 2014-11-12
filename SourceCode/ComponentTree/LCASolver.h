@@ -12,8 +12,8 @@ class LCASolver
 {
 public:
     LCASolver(Node *root);
-    LCASolver(LCASolver&) : root(0), eulerTour(), levelVector(), representatives(),
-        tc() { throw std::runtime_error("Not implemented yet!"); }
+    LCASolver(LCASolver&) : root(0), eulerTour(), representatives(), tc()
+        { throw std::runtime_error("Not implemented yet!"); }
     LCASolver& operator=(const LCASolver&)
     { throw std::runtime_error("Not implemented yet!"); }
 
@@ -27,7 +27,6 @@ private:
 
     Node* root;
     std::vector<Node*> eulerTour;
-    std::vector<unsigned short> levelVector;
     std::map<Node*,unsigned int> representatives;
     SparceTable tc;
 };

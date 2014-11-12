@@ -7,8 +7,8 @@ using namespace std;
 
 void LCASolver::buildSparceTable()
 {
-    double logBaseTwoVectorSize = log2(levelVector.size());
-    for(unsigned int i = 0; i < levelVector.size(); i++)
+    double logBaseTwoVectorSize = log2(eulerTour.size());
+    for(unsigned int i = 0; i < eulerTour.size(); i++)
     {
         for(unsigned int j = 0; j < logBaseTwoVectorSize; j++)
         {
@@ -18,9 +18,9 @@ void LCASolver::buildSparceTable()
             {
                 try
                 {
-                    if(levelVector.at(k) > maximum)
+                    if(eulerTour.at(k)->getLevel() > maximum)
                     {
-                        maximum = levelVector.at(k);
+                        maximum = eulerTour.at(k)->getLevel();
                         position = k;
                     }
                 }
@@ -65,8 +65,8 @@ void LCASolver::doEulerTour(Node* node)
     }
 }
 
-LCASolver::LCASolver(Node* root) : root(root), eulerTour(), levelVector(),
-    representatives(), tc()
+LCASolver::LCASolver(Node* root) : root(root), eulerTour(), representatives(),
+    tc()
 {
     if(!root)
     {
@@ -74,8 +74,6 @@ LCASolver::LCASolver(Node* root) : root(root), eulerTour(), levelVector(),
     }
 
     doEulerTour(root);
-    for_each(eulerTour.begin(),eulerTour.end(),[&](Node* n)
-    {levelVector.push_back(n->getLevel());});
     calculateRepresentatives(root);
     buildSparceTable();
 }
@@ -109,7 +107,7 @@ unsigned short LCASolver::getLevelRMQ(unsigned int position1, unsigned int posit
                               pow(2,logBase2BetweenPosition),
                               logBase2BetweenPosition)];
 
-    if(levelVector.at(minOnRange1) > levelVector.at(minOnRange2))
+    if(eulerTour.at(minOnRange1)->getLevel() > eulerTour.at(minOnRange2)->getLevel())
     {
         return minOnRange1;
     }
