@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <stdexcept>
+#include <limits>
 
 #include "ComponentTree.h"
 #include "DisjointSetCollection.h"
@@ -42,39 +43,6 @@ vector<ushort> SpecialSort (const vector<ushort>& arr)
     return result;
 }
 
-// UTILITIES
-vector<Node*> eulerTour;
-map<Node*,unsigned int> representatives;
-
-void calculateEulerTour(Node* root)
-{
-    eulerTour.push_back(root);
-    for (auto& child : root->getChilds())
-    {
-        calculateEulerTour(child);
-        eulerTour.push_back(root);
-    }
-}
-
-void calculateRepresentatives(Node* root)
-{
-    unsigned int pos = 0;
-    for (auto& node : eulerTour)
-    {
-        if (node == root)
-        {
-            representatives[root] = pos;
-            break;
-        }
-        pos++;
-    }
-    for (auto& child : root->getChilds())
-    {
-        calculateRepresentatives(child);
-    }
-
-}
-
 void deleteTree(Node* root)
 {
     for (auto& node : root->getChilds())
@@ -83,16 +51,23 @@ void deleteTree(Node* root)
     }
     delete root;
 }
+
 } // namespace
 
 /*
  * Constructor. Builds component tree
  */
 ComponentTree::ComponentTree(const Image& image) : totalNodes(0),
-    componentMapping(),root(0)
+    componentMapping(),root(0), lcaSolver(0)
 
 {
     buildComponentTree(image);
+}
+
+ComponentTree::~ComponentTree()
+{
+    delete lcaSolver;
+    deleteTree(root);
 }
 
 // TODO: split this method in several ones
@@ -192,7 +167,7 @@ void ComponentTree::buildComponentTree(const Image& image)
                 else
                 {
                     // currentNode is the father of neighbor node
-                    nodes.at(currentNode)->addChilds(nodes.at(neighborNode));
+                    nodes.at(currentNode)->addChild(nodes.at(neighborNode));
                 }
 
                 /* both partial trees now should be linked, and the root of
@@ -221,14 +196,7 @@ void ComponentTree::buildComponentTree(const Image& image)
     // Get the root of that partial tree
     unsigned int rootIndex = partialTreeRoot.at(partialt);
     root = nodes.at(rootIndex);
-
-    calculateEulerTour(root);
-    calculateRepresentatives(root);
-}
-
-ComponentTree::~ComponentTree()
-{
-    deleteTree(root);
+    lcaSolver = new LCASolver(root);
 }
 
 Node* ComponentTree::getMinimum(const NodeSet& nodes) const
@@ -264,7 +232,7 @@ Node* ComponentTree::getHighestFork(const NodeSet& nodes) const
     {
         if (node != minLevelNode)
         {
-            Node* blca = getBinaryLeastCommonAncestor(node,highestFork);
+            Node* blca = lcaSolver->getLCA(node,highestFork);
             if (blca && blca != node && blca != highestFork)
             {
                 // then they are separated
@@ -279,46 +247,3 @@ Node* ComponentTree::getHighestFork(const NodeSet& nodes) const
     }
     return 0;
 }
-
-Node* ComponentTree::getBinaryLeastCommonAncestor(Node* node1, Node* node2) const
-{
-    if (!node1)
-    {
-        throw invalid_argument
-                ("Null node1 to calcula binary least common ancestor");
-    }
-
-    if (!node2)
-    {
-        throw invalid_argument
-                ("Null node2 to calcula binary least common ancestor");
-    }
-
-    unsigned int node1Representative = representatives[node1];
-    unsigned int node2Representative = representatives[node2];
-
-    if (node1Representative > node2Representative)
-    {
-        // lets do a swap
-        unsigned int temp = node1Representative;
-        node1Representative = node2Representative;
-        node2Representative = temp;
-    }
-
-    Node* blca = eulerTour.at(node1Representative);
-    for (unsigned int index = node1Representative + 1;
-         index <= node2Representative; index++)
-    {
-        if (eulerTour.at(index)->getLevel() > blca->getLevel())
-        {
-            blca = eulerTour.at(index);
-        }
-    }
-
-    return blca;
-}
-
-
-
-
-

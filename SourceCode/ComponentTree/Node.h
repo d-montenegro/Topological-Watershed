@@ -13,7 +13,7 @@ class Node
 public:
     Node(unsigned short l) : level(l), childs() {}
     void addChilds(NodeSet nodes) { childs.insert(nodes.begin(),nodes.end()); }
-    void addChilds(Node* node) { childs.insert(node); }
+    void addChild(Node* node) { childs.insert(node); }
 
     unsigned short getLevel() { return level; }
     NodeSet getChilds() { return childs; }

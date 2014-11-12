@@ -5,6 +5,7 @@
 
 #include "ImageFourNeighborType.h"
 #include "ComponentTree.h"
+#include "LCASolver.h"
 
 TEST(ComponentTreeTest, checkComponentTree) {
     vector<ushort> imagePixels = { 1,1,1,1,3,0,0,0,0, // 8
@@ -136,4 +137,59 @@ TEST(ComponentTreeTest, checkComponentTree) {
 
     NodeSet allNodes = {c1,c2,c3,c5,c6,c7,c9};
     ASSERT_EQ(c9,tree.getHighestFork(allNodes));
+}
+
+TEST(LCASolverTest, checkLCASolver)
+{
+    Node* a = new Node(4);
+
+    Node* b = new Node(3);
+    Node* c = new Node(3);
+
+    Node* d = new Node(2);
+    Node* e = new Node(2);
+    Node* f = new Node(2);
+    Node* g = new Node(2);
+    Node* h = new Node(2);
+
+    Node* i = new Node(1);
+
+    Node* j = new Node(0);
+
+    a->addChild(b);
+    a->addChild(c);
+
+    b->addChild(d);
+    b->addChild(e);
+    b->addChild(f);
+
+    c->addChild(g);
+    c->addChild(h);
+
+    f->addChild(i);
+
+    i->addChild(j);
+
+    LCASolver lcaSolver(a);
+    ASSERT_EQ(a,lcaSolver.getLCA(a,b));
+    ASSERT_EQ(a,lcaSolver.getLCA(a,c));
+    ASSERT_EQ(a,lcaSolver.getLCA(b,c));
+    ASSERT_EQ(b,lcaSolver.getLCA(d,e));
+    ASSERT_EQ(a,lcaSolver.getLCA(d,g));
+    ASSERT_EQ(b,lcaSolver.getLCA(d,i));
+    ASSERT_EQ(f,lcaSolver.getLCA(j,f));
+    ASSERT_EQ(a,lcaSolver.getLCA(h,j));
+    ASSERT_EQ(c,lcaSolver.getLCA(g,h));
+    ASSERT_EQ(a,lcaSolver.getLCA(a,j));
+
+    delete a;
+    delete b;
+    delete c;
+    delete d;
+    delete e;
+    delete f;
+    delete g;
+    delete h;
+    delete i;
+    delete j;
 }

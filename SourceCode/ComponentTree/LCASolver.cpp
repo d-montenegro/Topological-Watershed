@@ -1,4 +1,3 @@
-#include <iostream>
 #include <limits>
 #include <cmath>
 #include <algorithm>
@@ -13,15 +12,15 @@ void LCASolver::buildSparceTable()
     {
         for(unsigned int j = 0; j < logBaseTwoVectorSize; j++)
         {
-            unsigned short minimum = numeric_limits<ushort>::max();
-            unsigned int position = numeric_limits<unsigned int>::max();
+            unsigned short maximum = numeric_limits<ushort>::min();
+            unsigned int position = numeric_limits<unsigned int>::min();
             for(unsigned int k = i; k <= i + pow(2,j) - 1; k++)
             {
                 try
                 {
-                    if(levelVector.at(k) < minimum)
+                    if(levelVector.at(k) > maximum)
                     {
-                        minimum = levelVector.at(k);
+                        maximum = levelVector.at(k);
                         position = k;
                     }
                 }
@@ -29,9 +28,8 @@ void LCASolver::buildSparceTable()
                 {
                     break;
                 }
+                tc[pair<unsigned int,unsigned int>(i,j)] = position;
             }
-            cout << "Sparce Table (" << i << "," << j << "): " << position << endl;
-            tc[pair<unsigned int,unsigned int>(i,j)] = position;
         }
     }
 }
@@ -101,17 +99,17 @@ unsigned short LCASolver::getLevelRMQ(unsigned int position1, unsigned int posit
     unsigned int logBase2BetweenPosition = log2(position2 - position1);
 
     // position in euler tour between range[position1,position1 + 2^logBase2BetweenPosition]
-    // of the minimun level between
+    // of the maximum level between
     unsigned int minOnRange1 = tc[pair<unsigned int,unsigned int>(position1,
                               logBase2BetweenPosition)];
 
     // position in euler tour between range[position2 - pow(2,logBase2BetweenPosition) + 1,
-    // position2 + 2^logBase2BetweenPosition] of the minimun level between
+    // position2 + 2^logBase2BetweenPosition] of the maximum level between
     unsigned int minOnRange2 = tc[pair<unsigned int,unsigned int>(position2 -
                               pow(2,logBase2BetweenPosition),
                               logBase2BetweenPosition)];
 
-    if(levelVector.at(minOnRange1) < levelVector.at(minOnRange2))
+    if(levelVector.at(minOnRange1) > levelVector.at(minOnRange2))
     {
         return minOnRange1;
     }

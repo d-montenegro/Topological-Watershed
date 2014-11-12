@@ -6,6 +6,7 @@
 
 #include "Image.h"
 #include "Node.h"
+#include "LCASolver.h"
 
 using namespace std;
 
@@ -16,7 +17,7 @@ class ComponentTree
 public:
     ComponentTree(const Image& image);
     ComponentTree(const ComponentTree&) : totalNodes(0), componentMapping(),
-        root(0)
+        root(0), lcaSolver(0)
     {
         throw std::runtime_error("Unimplemented yet!!");
     }
@@ -37,11 +38,11 @@ public:
 
 private:
     void buildComponentTree(const Image& image);
-    Node* getBinaryLeastCommonAncestor(Node *node1, Node *node2) const;
 
     unsigned int totalNodes;
     ComponentMapping componentMapping;
     Node* root;
+    LCASolver* lcaSolver;
 };
 
 #endif // __COMPONENTTREE_H_INCLUDED__
