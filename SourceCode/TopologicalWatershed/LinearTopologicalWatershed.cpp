@@ -68,7 +68,7 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
 
 set<WDestructibleElement> initializeSet(Image& image,
                                         ComponentTree& componentTree,
-                                        const Tile tile);
+                                        const Tile& tile);
 
 vector<Tile> divideImageInTiles(Image&, ushort);
 
@@ -217,7 +217,7 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
 
 set<WDestructibleElement> initializeSet(Image& image,
                                         ComponentTree& componentTree,
-                                        const Tile tile)
+                                        const Tile& tile)
 {
     set<WDestructibleElement> elements;
     for (auto point : tile)
