@@ -4,11 +4,18 @@
 #include "Image.h"
 #include <vector>
 
-void readImage(const std::string& imagePath, const std::string& format,
+enum IMAGE_FORMAT
+{
+    JPG = 0,
+    JPEG,
+    PNG
+};
+
+void readImage(const std::string& imagePath, IMAGE_FORMAT format,
                std::vector<ushort>& pixels, unsigned int& width,
                unsigned int& height);
 
-void writeImage(const std::string& imagePath, const std::string& format,
+void writeImage(const std::string& imagePath, IMAGE_FORMAT format,
                 const std::vector<ushort>& pixels, unsigned int width,
                 unsigned int height);
 

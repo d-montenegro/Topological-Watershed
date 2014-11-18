@@ -6,7 +6,7 @@ set(TopologicalWatershed_VERSION_MAJOR 1)
 set(TopologicalWatershed_VERSION_MINOR 0)
 
 # Options. Turn ON to build tests.
-option(test "Tests." ON)
+option(UNITTEST "Tests." ON)
 
 # compilation flags
 SET(CMAKE_CXX_FLAGS  "-Wall -Wextra -ansi -pedantic -Weffc++ -gdwarf-3 -std=c++11")
@@ -25,7 +25,7 @@ add_subdirectory(ComponentTree)
 add_subdirectory(TopologicalWatershed)
 add_subdirectory(BidimiensionalArrayPartitioner)
 
-if (test)
+if(UNITTEST)
     enable_testing()
     find_package(GTest REQUIRED)
     add_subdirectory(${CMAKE_SOURCE_DIR}/ImageHandler/UnitTest)
@@ -33,4 +33,4 @@ if (test)
     add_subdirectory(${CMAKE_SOURCE_DIR}/ComponentTree/UnitTest)
     add_subdirectory(${CMAKE_SOURCE_DIR}/BidimiensionalArrayPartitioner/UnitTest)
     add_subdirectory(${CMAKE_SOURCE_DIR}/TopologicalWatershed/UnitTest)
-endif()
+endif(UNITTEST)
