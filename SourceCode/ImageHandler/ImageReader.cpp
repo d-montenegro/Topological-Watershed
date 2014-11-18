@@ -168,7 +168,7 @@ void writeJpgImage(const std::string& imagePath, const std::vector<ushort>& pixe
 void writePngImage(const std::string& imagePath, const std::vector<ushort>& pixels,
                    unsigned int width, unsigned int height)
 {
-    png::image<png::gray_pixel> image;
+    png::image<png::gray_pixel> image(width,height);
 
     for(unsigned int y = 0; y < height; y++)
     {

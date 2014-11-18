@@ -135,4 +135,5 @@ int main(int argc, char* argv[])
             float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
     delete image;
+    return 0;
 }
