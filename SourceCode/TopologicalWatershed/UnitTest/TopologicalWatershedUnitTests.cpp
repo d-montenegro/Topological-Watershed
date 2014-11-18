@@ -1,7 +1,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include "ImageFourNeighborType.h"
-#include "LinearTopologicalWatershed.h"
+#include "TopologicalWatershed.h"
 
 TEST(LinearTopologicalWatershed, performTopologicalWatershedOnSynteticImage) {
     vector<ushort> pixels = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

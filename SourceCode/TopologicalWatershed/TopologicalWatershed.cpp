@@ -5,7 +5,7 @@
 #include <mutex>
 #include "Node.h"
 #include "WDestructibleElement.h"
-#include "LinearTopologicalWatershed.h"
+#include "TopologicalWatershed.h"
 #include "BidimiensionalArrayPartitioner.h"
 
 using namespace std;

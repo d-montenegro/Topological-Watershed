@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <cstring>
 
-#include "LinearTopologicalWatershed.h"
+#include "TopologicalWatershed.h"
 #include "ImageReader.h"
 #include "ImageFourNeighborType.h"
 

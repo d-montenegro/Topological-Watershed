@@ -3,7 +3,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#include "LinearTopologicalWatershed.h"
+#include "TopologicalWatershed.h"
 #include "ImageReader.h"
 #include "ImageFourNeighborType.h"
 
