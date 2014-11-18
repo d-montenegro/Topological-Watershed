@@ -30,7 +30,7 @@ void printUsage(string binaryName)
 
 int main(int argc, char* argv[])
 {
-    if (argc != 9)
+    if (argc != 11)
     {
         cout << "Wrong params." << endl;
         printUsage(argv[0]);
