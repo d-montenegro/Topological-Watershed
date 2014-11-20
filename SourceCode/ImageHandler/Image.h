@@ -75,7 +75,7 @@ public:
         {
             if(index != 0 && index % width == 0)
                 cout << endl;
-            if(pixels.at(index) < 10)
+            if(highestGreyIntensity >= 10 && pixels.at(index) < 10)
                 cout << 0;
             cout << pixels.at(index) << " ";
         }
