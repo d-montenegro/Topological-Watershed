@@ -110,6 +110,9 @@ void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
 void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
                                     ushort numberOfThreads)
 {
+    pendingBorderPoints.clear();
+    pendingInnerPoints.clear();
+
     // TODO: check for possible values of variable numberOfThreads!
     vector<Tile>tiles = divideSquareIntoTiles(image.getWidth(),image.getHeight(),
                                               numberOfThreads);
