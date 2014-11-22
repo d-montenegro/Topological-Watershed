@@ -7,7 +7,26 @@
 #include "ComponentTree.h"
 #include "LCASolver.h"
 
-TEST(ComponentTreeTest, checkComponentTree) {
+namespace {
+
+vector<ushort> getComponent(const ComponentMapping& componentMapping,
+                            Node* node)
+{
+    vector<ushort> result;
+    for(auto& element : componentMapping)
+    {
+        if(element.second == node)
+        {
+            result.push_back(element.first);
+        }
+    }
+
+    return result;
+}
+
+} // anonymous namespace
+
+TEST(ComponentTreeTest, checkComponentTree_0) {
     vector<ushort> imagePixels = { 1,1,1,1,3,0,0,0,0, // 8
                                    0,0,0,3,2,3,0,0,0, // 17
                                    0,0,3,2,2,2,3,0,0, // 26
@@ -19,55 +38,34 @@ TEST(ComponentTreeTest, checkComponentTree) {
 
     ASSERT_EQ(7,tree.getTotalNodes());
 
-    vector<ushort> component_1 = { 9,10,11,18,19,27,36,37,39,45,46,47,48 };
-    vector<ushort> component_2 = { 5,6,7,8,15,16,17,25,26,35,41,43,44,50,51,52,53 };
-    vector<ushort> component_3 = { 0,1,2,3 };
-    vector<ushort> component_5 = { 33 };
-    vector<ushort> component_6 = { 29 };
-    vector<ushort> component_7 = { 13,21,22,23,31,40,49 };
-    vector<ushort> component_9 = { 4,12,14,20,24,28,30,32,34,38};
+    Node *c1 = tree.getComponentMapping().at(9);
+    Node *c2 = tree.getComponentMapping().at(5);
+    Node *c3 = tree.getComponentMapping().at(0);
+    Node *c5 = tree.getComponentMapping().at(33);
+    Node *c6 = tree.getComponentMapping().at(29);
+    Node *c7 = tree.getComponentMapping().at(13);
+    Node *c9 = tree.getComponentMapping().at(4);
 
-    Node *c1 = tree.getComponentMapping().at(component_1.at(0));
-    for (auto& element : component_1)
-    {
-        ASSERT_EQ(c1,tree.getComponentMapping().at(element));
-    }
+    ASSERT_EQ(vector<ushort>({ 9,10,11,18,19,27,36,37,39,45,46,47,48 }),
+        getComponent(tree.getComponentMapping(),c1));
 
-    Node *c2 = tree.getComponentMapping().at(component_2.at(0));
-    for (auto& element : component_2)
-    {
-        ASSERT_EQ(c2,tree.getComponentMapping().at(element));
-    }
+    ASSERT_EQ(vector<ushort>({ 5,6,7,8,15,16,17,25,26,35,41,43,44,50,51,52,53 }),
+        getComponent(tree.getComponentMapping(),c2));
 
-    Node *c3 = tree.getComponentMapping().at(component_3.at(0));
-    for (auto& element : component_3)
-    {
-        ASSERT_EQ(c3,tree.getComponentMapping().at(element));
-    }
+    ASSERT_EQ(vector<ushort>({ 0,1,2,3 }),
+        getComponent(tree.getComponentMapping(),c3));
 
-    Node *c5 = tree.getComponentMapping().at(component_5.at(0));
-    for (auto& element : component_5)
-    {
-        ASSERT_EQ(c5,tree.getComponentMapping().at(element));
-    }
+    ASSERT_EQ(vector<ushort>({ 33 }),
+        getComponent(tree.getComponentMapping(),c5));
 
-    Node *c6 = tree.getComponentMapping().at(component_6.at(0));
-    for (auto& element : component_6)
-    {
-        ASSERT_EQ(c6,tree.getComponentMapping().at(element));
-    }
+    ASSERT_EQ(vector<ushort>({ 29 }),
+        getComponent(tree.getComponentMapping(),c6));
 
-    Node *c7 = tree.getComponentMapping().at(component_7.at(0));
-    for (auto& element : component_7)
-    {
-        ASSERT_EQ(c7,tree.getComponentMapping().at(element));
-    }
+    ASSERT_EQ(vector<ushort>({ 13,21,22,23,31,40,42,49 }),
+        getComponent(tree.getComponentMapping(),c7));
 
-    Node *c9 = tree.getComponentMapping().at(component_9.at(0));
-    for (auto& element : component_9)
-    {
-        ASSERT_EQ(c9,tree.getComponentMapping().at(element));
-    }
+    ASSERT_EQ(vector<ushort>({ 4,12,14,20,24,28,30,32,34,38 }),
+        getComponent(tree.getComponentMapping(),c9));
 
     ASSERT_NE(c1,c2);
     ASSERT_NE(c1,c3);
@@ -138,6 +136,129 @@ TEST(ComponentTreeTest, checkComponentTree) {
     NodeSet allNodes = {c1,c2,c3,c5,c6,c7,c9};
     ASSERT_EQ(c9,tree.getHighestFork(allNodes));
 }
+
+
+TEST(ComponentTreeTest, checkComponentTree_1) {
+
+    vector<ushort> pixels = { 0,9,0,0,0,8,8,2,2,2,5,3,3,
+                              0,9,6,5,8,8,8,8,2,7,7,7,3,
+                              0,9,1,1,8,9,8,8,2,7,7,3,3,
+                              0,9,9,7,8,8,8,8,2,7,7,7,3,
+                              0,9,0,0,0,8,8,5,2,7,7,5,3,
+                              0,9,9,0,0,8,8,5,2,7,7,5,3 };
+
+    ImageFourNeighborType image(pixels,13,6);
+    ComponentTree tree(image);
+
+    ASSERT_EQ(13, tree.getTotalNodes());
+
+    Node* a = tree.getComponentMapping().at(0);
+    Node* b = tree.getComponentMapping().at(2);
+    Node* c = tree.getComponentMapping().at(54);
+    Node* d = tree.getComponentMapping().at(28);
+    Node* e = tree.getComponentMapping().at(7);
+    Node* f = tree.getComponentMapping().at(11);
+    Node* g = tree.getComponentMapping().at(16);
+    Node* h = tree.getComponentMapping().at(10);
+    Node* i = tree.getComponentMapping().at(15);
+    Node* j = tree.getComponentMapping().at(42);
+    Node* k = tree.getComponentMapping().at(22);
+    Node* l = tree.getComponentMapping().at(5);
+    Node* m = tree.getComponentMapping().at(1);
+
+    // Check component mapping
+    ASSERT_EQ(vector<ushort>({ 0,13,26,39,52,65 }),
+        getComponent(tree.getComponentMapping(),a));
+
+    ASSERT_EQ(vector<ushort>({ 2,3,4 }),
+        getComponent(tree.getComponentMapping(),b));
+
+    ASSERT_EQ(vector<ushort>({ 54,55,56,68,69 }),
+        getComponent(tree.getComponentMapping(),c));
+
+    ASSERT_EQ(vector<ushort>({ 28,29 }),
+        getComponent(tree.getComponentMapping(),d));
+
+    ASSERT_EQ(vector<ushort>({ 7,8,9,21,34,47,60,73 }),
+        getComponent(tree.getComponentMapping(),e));
+
+    ASSERT_EQ(vector<ushort>({ 11,12,25,37,38,51,64,77 }),
+        getComponent(tree.getComponentMapping(),f));
+
+    ASSERT_EQ(vector<ushort>({ 16 }),getComponent(tree.getComponentMapping(),g));
+
+    ASSERT_EQ(vector<ushort>({ 10,59,63,72,76 }),
+        getComponent(tree.getComponentMapping(),h));
+
+    ASSERT_EQ(vector<ushort>({ 15 }),
+        getComponent(tree.getComponentMapping(),i));
+
+    ASSERT_EQ(vector<ushort>({ 42 }),
+        getComponent(tree.getComponentMapping(),j));
+
+    ASSERT_EQ(vector<ushort>({ 22,23,24,35,36,48,49,50,61,62,74,75 }),
+        getComponent(tree.getComponentMapping(),k));
+
+    ASSERT_EQ(vector<ushort>({ 5,6,17,18,19,20,30,32,33,43,44,45,46,57,58,70,71 }),
+        getComponent(tree.getComponentMapping(),l));
+
+    ASSERT_EQ(vector<ushort>({ 1,14,27,31,40,41,53,66,67 }),
+        getComponent(tree.getComponentMapping(),m));
+
+    // Check root
+    ASSERT_EQ(m, tree.getRoot());
+    ASSERT_EQ(2, m->getChilds().size());
+    ASSERT_EQ(10, m->getLevel());
+    ASSERT_NE(m->getChilds().end(), m->getChilds().find(a));
+    ASSERT_NE(m->getChilds().end(), m->getChilds().find(l));
+
+    ASSERT_EQ(2, l->getChilds().size());
+    ASSERT_EQ(9, l->getLevel());
+    ASSERT_NE(l->getChilds().end(), l->getChilds().find(j));
+    ASSERT_NE(l->getChilds().end(), l->getChilds().find(k));
+
+    ASSERT_EQ(2, j->getChilds().size());
+    ASSERT_EQ(8, j->getLevel());
+    ASSERT_NE(j->getChilds().end(), j->getChilds().find(i));
+    ASSERT_NE(j->getChilds().end(), j->getChilds().find(c));
+
+    ASSERT_EQ(1, k->getChilds().size());
+    ASSERT_EQ(8, k->getLevel());
+    ASSERT_NE(k->getChilds().end(), j->getChilds().find(h));
+
+    ASSERT_EQ(1, i->getChilds().size());
+    ASSERT_EQ(7, i->getLevel());
+    ASSERT_NE(i->getChilds().end(), i->getChilds().find(g));
+
+    ASSERT_EQ(2, g->getChilds().size());
+    ASSERT_EQ(6, g->getLevel());
+    ASSERT_NE(g->getChilds().end(), g->getChilds().find(b));
+    ASSERT_NE(g->getChilds().end(), g->getChilds().find(d));
+
+    ASSERT_EQ(2, h->getChilds().size());
+    ASSERT_EQ(6, h->getLevel());
+    ASSERT_NE(h->getChilds().end(), h->getChilds().find(e));
+    ASSERT_NE(h->getChilds().end(), h->getChilds().find(f));
+
+    ASSERT_EQ(0, f->getChilds().size());
+    ASSERT_EQ(4, f->getLevel());
+
+    ASSERT_EQ(0, e->getChilds().size());
+    ASSERT_EQ(3, e->getLevel());
+
+    ASSERT_EQ(0, d->getChilds().size());
+    ASSERT_EQ(2, d->getLevel());
+
+    ASSERT_EQ(0, c->getChilds().size());
+    ASSERT_EQ(1, c->getLevel());
+
+    ASSERT_EQ(0, b->getChilds().size());
+    ASSERT_EQ(1, b->getLevel());
+
+    ASSERT_EQ(0, a->getChilds().size());
+    ASSERT_EQ(1, a->getLevel());
+}
+
 
 TEST(LCASolverTest, checkLCASolver)
 {

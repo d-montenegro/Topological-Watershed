@@ -80,6 +80,10 @@ LCASolver::LCASolver(Node* root) : root(root), eulerTour(), representatives(),
 
 Node* LCASolver::getLCA(Node *a, Node *b)
 {
+    if(a == b)
+    {
+        throw invalid_argument("a are b must be different");
+    }
     return eulerTour.at(getLevelRMQ(representatives.at(a),representatives.at(b)));
 }
 

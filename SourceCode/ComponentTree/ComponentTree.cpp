@@ -230,7 +230,7 @@ Node* ComponentTree::getHighestFork(const NodeSet& nodes) const
     Node* highestFork = minLevelNode;
     for (auto& node : nodes)
     {
-        if (node != minLevelNode)
+        if (node != minLevelNode && node != highestFork)
         {
             Node* blca = lcaSolver->getLCA(node,highestFork);
             if (blca && blca != node && blca != highestFork)
