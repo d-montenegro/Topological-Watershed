@@ -18,7 +18,7 @@ void printUsage(string binaryName)
 {
     cout << "Usage is " << binaryName <<
             " -in <source_image_path> -f <source_image_format> -out <dest_image_path>\
-            -r <neighbor_relation>" << endl  << endl
+-r <neighbor_relation>" << endl  << endl
          << "source_image_path is the path to a greyscale" << endl
          << "source_image_format is the format of the source image, may be JPG, JPEG or PNG" << endl
          << "dest_image_path is the path where the processed image will be wrote" << endl
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
         {
             destinationImage = argv[i+1];
         }
-        else if (strcmp(argv[i],"-r"))
+        else if (strcmp(argv[i],"-r") == 0)
         {
             if(strcmp(argv[i+1],"4") == 0)
             {
