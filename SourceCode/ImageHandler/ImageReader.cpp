@@ -178,5 +178,13 @@ void writePngImage(const std::string& imagePath, const std::vector<ushort>& pixe
         }
     }
 
-    image.write(imagePath);
+    try
+    {
+        image.write(imagePath);
+    }
+    catch (runtime_error e)
+    {
+        throw runtime_error("Could not write on: \"" + imagePath +
+                            "\". Reason: " + string(e.what()));
+    }
 }

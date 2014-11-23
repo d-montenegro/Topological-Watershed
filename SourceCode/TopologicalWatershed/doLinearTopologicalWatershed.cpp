@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
         {
             sourceImage = argv[i+1];
         }
-        else if (strcmp(argv[i],"-f"))
+        else if (strcmp(argv[i],"-f") == 0)
         {
             if(strcmp(argv[i+1],"JPG") == 0)
             {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
                 return 0;
             }
         }
-        else if (strcmp(argv[i],"-out"))
+        else if (strcmp(argv[i],"-out") == 0)
         {
             destinationImage = argv[i+1];
         }
