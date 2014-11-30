@@ -19,7 +19,7 @@ void printUsage(string binaryName)
 {
     cout << "Usage is " << binaryName <<
             " -in <source_image_path> -f <source_image_format> -out <dest_image_path>\
--r <neighbor_relation> -t <thread_number>" << endl  << endl
+ -r <neighbor_relation> -t <thread_number>" << endl  << endl
          << "source_image_path is the path to a greyscale" << endl
          << "source_image_format is the format of the source image, may be JPG, JPEG or PNG" << endl
          << "dest_image_path is the path where the processed image will be wrote" << endl

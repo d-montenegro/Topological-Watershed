@@ -21,7 +21,7 @@ public:
 
 private:
     void doEulerTour(Node* node);
-    void calculateRepresentatives(Node* node);
+    void calculateRepresentatives();
     unsigned short getLevelRMQ(unsigned int position1, unsigned int position2);
     void buildSparceTable();
 

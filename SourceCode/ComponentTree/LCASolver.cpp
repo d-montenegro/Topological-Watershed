@@ -1,3 +1,4 @@
+#include <iostream>
 #include <limits>
 #include <cmath>
 #include <algorithm>
@@ -7,50 +8,49 @@ using namespace std;
 
 void LCASolver::buildSparceTable()
 {
-    double logBaseTwoVectorSize = log2(eulerTour.size());
-    for(unsigned int i = 0; i < eulerTour.size(); i++)
+    size_t vectorSize = eulerTour.size();
+    cout << "vector size: " <<  vectorSize << endl;
+    for(unsigned int i = 0; i < vectorSize; i++)
     {
-        for(unsigned int j = 0; j < logBaseTwoVectorSize; j++)
+        tc[pair<unsigned int,unsigned int>(i,0)] = i;
+    }
+
+    double logBaseTwoVectorSize = log2(vectorSize);
+    for(unsigned int j = 1; j < logBaseTwoVectorSize; j++)
+    {
+        unsigned int blockSize = pow(2,j-1);
+        unsigned int n = vectorSize - (blockSize * 2);
+        for(unsigned int i = 0; i < n; i++)
         {
-            unsigned short maximum = numeric_limits<ushort>::min();
-            unsigned int position = numeric_limits<unsigned int>::min();
-            for(unsigned int k = i; k <= i + pow(2,j) - 1; k++)
+            unsigned int maximumBlockOnePosition =
+                    tc[pair<unsigned int,unsigned int>(i,j-1)];
+            unsigned int maximumBlockTwoPosition =
+                    tc[pair<unsigned int,unsigned int>(i+blockSize,j-1)];
+
+            if(eulerTour.at(maximumBlockOnePosition)->getLevel() >=
+                    eulerTour.at(maximumBlockTwoPosition)->getLevel())
             {
-                try
-                {
-                    if(eulerTour.at(k)->getLevel() > maximum)
-                    {
-                        maximum = eulerTour.at(k)->getLevel();
-                        position = k;
-                    }
-                }
-                catch(out_of_range& e)
-                {
-                    break;
-                }
-                tc[pair<unsigned int,unsigned int>(i,j)] = position;
+                tc[pair<unsigned int,unsigned int>(i,j)] = maximumBlockOnePosition;
+            }
+            else
+            {
+                tc[pair<unsigned int,unsigned int>(i,j)] = maximumBlockTwoPosition;
             }
         }
     }
 }
 
 
-void LCASolver::calculateRepresentatives(Node* node)
+void LCASolver::calculateRepresentatives()
 {
     unsigned int pos = 0;
     for (vector<Node*>::iterator it = eulerTour.begin(); it != eulerTour.end(); ++it)
     {
-        if ((*it) == node)
+        if (representatives.find(*it) == representatives.end())
         {
-            representatives[node] = pos;
-            break;
+            representatives[*it] = pos;
         }
         pos++;
-    }
-    NodeSet childs = node->getChilds();
-    for (NodeSet::iterator it = childs.begin(); it != childs.end(); ++it)
-    {
-        calculateRepresentatives(*it);
     }
 }
 
@@ -74,8 +74,14 @@ LCASolver::LCASolver(Node* root) : root(root), eulerTour(), representatives(),
     }
 
     doEulerTour(root);
-    calculateRepresentatives(root);
+    calculateRepresentatives();
     buildSparceTable();
+
+    for(auto& num : tc)
+    {
+        cout << "tc(" << num.first.first << "," << num.first.second <<
+                ") = " << num.second << endl;
+    }
 }
 
 Node* LCASolver::getLCA(Node *a, Node *b)
