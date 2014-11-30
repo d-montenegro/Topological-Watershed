@@ -14,7 +14,7 @@ namespace
 
 struct ArraySorter
 {
-    const vector<ushort> arr;
+    vector<ushort> arr;
     ArraySorter(const vector<ushort>& arr) : arr(arr) {}
 
     bool operator() (unsigned int a, unsigned int b) const
@@ -31,12 +31,9 @@ struct ArraySorter
  */
 vector<ushort> SpecialSort (const vector<ushort>& arr)
 {
-    vector<ushort> result;
+    vector<ushort> result(arr.size());
 
-    for (unsigned int i = 0; i < arr.size(); i++)
-    {
-        result.push_back(i);
-    }
+    iota(result.begin(), result.end(), 0);
 
     sort(result.begin(), result.end(), ArraySorter(arr));
 
@@ -83,13 +80,14 @@ void ComponentTree::buildComponentTree(const Image& image)
     DisjointSetCollection canonicalElements;
     vector<Node*> nodes;
 
-    unsigned int totalPixels = image.getPixels().size();
+    vector<ushort> pixels = image.getPixels();
+    unsigned int totalPixels = pixels.size();
     totalNodes = totalPixels;
     for (unsigned int pixelPosition = 0; pixelPosition < totalPixels;
          pixelPosition++)
     {
         // create a node for each pixel
-        nodes.push_back(new Node(image.getPixels().at(pixelPosition) + 1));
+        nodes.push_back(new Node(pixels.at(pixelPosition) + 1));
 
         // initialize partial trees
         partialTreeRoot.push_back(pixelPosition);

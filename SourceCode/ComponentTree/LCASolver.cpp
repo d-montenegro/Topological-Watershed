@@ -1,4 +1,3 @@
-#include <iostream>
 #include <limits>
 #include <cmath>
 #include <algorithm>
@@ -9,7 +8,6 @@ using namespace std;
 void LCASolver::buildSparceTable()
 {
     size_t vectorSize = eulerTour.size();
-    cout << "vector size: " <<  vectorSize << endl;
     for(unsigned int i = 0; i < vectorSize; i++)
     {
         tc[pair<unsigned int,unsigned int>(i,0)] = i;
@@ -76,12 +74,6 @@ LCASolver::LCASolver(Node* root) : root(root), eulerTour(), representatives(),
     doEulerTour(root);
     calculateRepresentatives();
     buildSparceTable();
-
-    for(auto& num : tc)
-    {
-        cout << "tc(" << num.first.first << "," << num.first.second <<
-                ") = " << num.second << endl;
-    }
 }
 
 Node* LCASolver::getLCA(Node *a, Node *b)
@@ -108,21 +100,21 @@ unsigned short LCASolver::getLevelRMQ(unsigned int position1, unsigned int posit
 
     // position in euler tour between range[position1,position1 + 2^logBase2BetweenPosition]
     // of the maximum level between
-    unsigned int minOnRange1 = tc[pair<unsigned int,unsigned int>(position1,
+    unsigned int maxOnRange1 = tc[pair<unsigned int,unsigned int>(position1,
                               logBase2BetweenPosition)];
 
     // position in euler tour between range[position2 - pow(2,logBase2BetweenPosition) + 1,
     // position2 + 2^logBase2BetweenPosition] of the maximum level between
-    unsigned int minOnRange2 = tc[pair<unsigned int,unsigned int>(position2 -
+    unsigned int maxOnRange2 = tc[pair<unsigned int,unsigned int>(position2 -
                               pow(2,logBase2BetweenPosition),
                               logBase2BetweenPosition)];
 
-    if(eulerTour.at(minOnRange1)->getLevel() > eulerTour.at(minOnRange2)->getLevel())
+    if(eulerTour.at(maxOnRange1)->getLevel() > eulerTour.at(maxOnRange2)->getLevel())
     {
-        return minOnRange1;
+        return maxOnRange1;
     }
     else
     {
-        return minOnRange2;
+        return maxOnRange2;
     }
 }
