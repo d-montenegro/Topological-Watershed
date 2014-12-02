@@ -161,12 +161,11 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
                     const unsigned int pixelPosition)
 {
     NodeSet nodesFromNeighbor;
-    ComponentMapping componentMapping = componentTree.getComponentMapping();
     set<unsigned int> neighbors = image.getLowerNeighbors(pixelPosition);
 
     for (auto& neighbor : neighbors)
     {
-        nodesFromNeighbor.insert(componentMapping.at(neighbor));
+        nodesFromNeighbor.insert(componentTree.getComponentMapping().at(neighbor));
     }
 
     if (nodesFromNeighbor.empty())

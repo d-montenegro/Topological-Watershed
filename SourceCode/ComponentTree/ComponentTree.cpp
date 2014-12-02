@@ -29,9 +29,9 @@ struct ArraySorter
  * If input is [3,5,4,1], the output will be [3,0,2,1] because at position 3 is
  * the lowest value (1), at position 0 is the next lowest value (3) and so on.
  */
-vector<ushort> SpecialSort (const vector<ushort>& arr)
+vector<unsigned int> SpecialSort(const vector<ushort>& arr)
 {
-    vector<ushort> result(arr.size());
+    vector<unsigned int> result(arr.size());
 
     iota(result.begin(), result.end(), 0);
 
@@ -96,7 +96,7 @@ void ComponentTree::buildComponentTree(const Image& image)
     }
 
     set<unsigned int> alreadyProcessed;
-    vector<ushort> orderedPixels = SpecialSort(image.getPixels());
+    vector<unsigned int> orderedPixels = SpecialSort(image.getPixels());
     for (auto& currentPixel : orderedPixels)
     {
         // mark pixel as processed

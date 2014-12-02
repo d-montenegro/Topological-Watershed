@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 
     doLinearTopologicalWatershed(*image, tree);
 
-    cout << "Parallel Topological Watershed performed - " <<
+    cout << "Linear Topological Watershed performed - " <<
             float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
     writeImage(destinationImage,format,image->getPixels(),
