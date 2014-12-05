@@ -4,9 +4,9 @@
 #include <thread>
 #include <mutex>
 #include "Node.h"
-#include "WDestructibleElement.h"
 #include "TopologicalWatershed.h"
 #include "BidimiensionalArrayPartitioner.h"
+#include "WDestructibleElementsCollection.h"
 
 using namespace std;
 
@@ -64,9 +64,9 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
 
 void processWDestructibleElement(Image& image, ComponentTree& componentTree,
                                  WDestructibleElement& element,
-                                 set<WDestructibleElement>& wDestructibleElements);
+                                 WDestructibleElementsCollection& wDestructibleElements);
 
-set<WDestructibleElement> initializeSet(Image& image,
+WDestructibleElementsCollection initializeSet(Image& image,
                                         ComponentTree& componentTree,
                                         const Tile& tile);
 
@@ -85,21 +85,20 @@ void doTopologicalWatershedOnBorder(Image& image,
  */
 void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
 {
-    set<WDestructibleElement> wDestructibleElements;
-    for (unsigned int currentPixel = 0; currentPixel < image.getPixels().size();
-         currentPixel++)
+    size_t imageSize = image.getPixels().size();
+    WDestructibleElementsCollection wDestructibleElements(imageSize);
+    for (unsigned int currentPixel = 0; currentPixel < imageSize; currentPixel++)
     {
         Node* node = wDestructible(image,componentTree,currentPixel);
         if (node)
         {
-            wDestructibleElements.insert(WDestructibleElement(currentPixel,node));
+            wDestructibleElements.addElement(WDestructibleElement(currentPixel,node));
         }
     }
 
-    while(!wDestructibleElements.empty())
+    while(!wDestructibleElements.isEmpty())
     {
-        WDestructibleElement element = *wDestructibleElements.begin();
-        wDestructibleElements.erase(wDestructibleElements.begin());
+        WDestructibleElement element = wDestructibleElements.getMinimum();
         processWDestructibleElement(image,componentTree,element,wDestructibleElements);
     }
 }
@@ -195,7 +194,7 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
 
 void processWDestructibleElement(Image& image, ComponentTree& componentTree,
                                  WDestructibleElement& element,
-                                 set<WDestructibleElement>& wDestructibleElements)
+                                 WDestructibleElementsCollection& wDestructibleElements)
 {
     image.setPixelValue(element.pixelPosition,element.futureNode->getLevel() - 1);
     componentTree.getComponentMapping().at(element.pixelPosition) = element.futureNode;
@@ -207,27 +206,27 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
             Node* node = wDestructible(image,componentTree,neighbor);
             if (!node)
             {
-                removeIfExistsByPixelPosition(wDestructibleElements, neighbor);
+                wDestructibleElements.removeElement(neighbor);
             }
             else
             {
-                addOrUpdate(wDestructibleElements, WDestructibleElement(neighbor, node));
+                wDestructibleElements.addElement(WDestructibleElement(neighbor,node));
             }
         }
     }
 }
 
-set<WDestructibleElement> initializeSet(Image& image,
+WDestructibleElementsCollection initializeSet(Image& image,
                                         ComponentTree& componentTree,
                                         const Tile& tile)
 {
-    set<WDestructibleElement> elements;
+    WDestructibleElementsCollection elements(image.getPixels().size());
     for (auto point : tile)
     {
         Node* node = wDestructible(image,componentTree,point);
         if (node)
         {
-            elements.insert(WDestructibleElement(point,node));
+            elements.addElement(WDestructibleElement(point,node));
         }
     }
 
@@ -239,11 +238,10 @@ void doTopologicalWatershedOnTile(Image& image,
                                   const Tile& tile,
                                   const Tile pixelsToProcess)
 {
-    set<WDestructibleElement> elements = initializeSet(image,componentTree,pixelsToProcess);
-    while(!elements.empty())
+    WDestructibleElementsCollection elements = initializeSet(image,componentTree,pixelsToProcess);
+    while(!elements.isEmpty())
     {
-        WDestructibleElement element = *elements.begin();
-        elements.erase(elements.begin());
+        WDestructibleElement element = elements.getMinimum();
         set<unsigned int> neighbors = image.getNeighbors(element.pixelPosition);
         if (includes(tile.begin(),tile.end(),neighbors.begin(),neighbors.end()))
         {
@@ -259,13 +257,11 @@ void doTopologicalWatershedOnTile(Image& image,
 void doTopologicalWatershedOnBorder(Image& image,
                                     ComponentTree& componentTree)
 {
-    set<WDestructibleElement> elements = initializeSet(image,componentTree,
+    WDestructibleElementsCollection elements = initializeSet(image,componentTree,
                                                        pendingBorderPoints);
-    while(!elements.empty())
+    while(!elements.isEmpty())
     {
-        WDestructibleElement element = *elements.begin();
-        elements.erase(elements.begin());
-
+        WDestructibleElement element = elements.getMinimum();
         image.setPixelValue(element.pixelPosition,element.futureNode->getLevel() - 1);
         componentTree.getComponentMapping().at(element.pixelPosition) = element.futureNode;
 
@@ -276,20 +272,14 @@ void doTopologicalWatershedOnBorder(Image& image,
                 Node* node = wDestructible(image,componentTree,neighbor);
                 if (!node)
                 {
-                    removeIfExistsByPixelPosition(elements, neighbor);
+                    elements.removeElement(neighbor);
                     pendingInnerPoints.erase(neighbor);
                 }
                 else
                 {
-                    set<WDestructibleElement>::iterator it =
-                            find_if(elements.begin(),elements.end(),
-                            [&](const WDestructibleElement& e)
-                            {
-                                return e.pixelPosition == neighbor;
-                            });
-                    if(it != elements.end())
+                    if(elements.isPresent(neighbor))
                     {
-                        it->futureNode = node;
+                        elements.addElement(WDestructibleElement(neighbor,node));
                     }
                     else
                     {

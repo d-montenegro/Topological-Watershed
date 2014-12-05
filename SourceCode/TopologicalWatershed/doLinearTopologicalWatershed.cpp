@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstring>
+#include <ctime>
 
 #include "TopologicalWatershed.h"
 #include "ImageReader.h"
@@ -99,11 +100,7 @@ int main(int argc, char* argv[])
     unsigned int width = 0;
     unsigned int height = 0;
 
-    const clock_t begin_time = clock();
     readImage(sourceImage,format,pixels,width,height);
-
-    cout << "Image readed - " <<
-            float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
     Image* image = 0;
     if(relationType == TYPE_4)
@@ -115,24 +112,20 @@ int main(int argc, char* argv[])
         throw invalid_argument("8_TYPE neighbor relation unimplemented yet.");
     }
 
-    cout << "Image instance created - " <<
-            float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
-
+    time_t start,end;
+    time(&start);
     ComponentTree tree(*image);
-
-    cout << "Component Tree done - " <<
-         float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
+    time(&end);
+    cout << "Component Tree done - " << (double)difftime(end,start) << " sec" << endl;
 
     doLinearTopologicalWatershed(*image, tree);
 
+    time(&end);
     cout << "Linear Topological Watershed performed - " <<
-            float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
+            (double)difftime(end,start) << " sec" << endl;
 
     writeImage(destinationImage,format,image->getPixels(),
                image->getWidth(),image->getWidth());
-
-    cout << "Image wrote - " <<
-            float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
     delete image;
     return 0;

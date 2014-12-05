@@ -2,6 +2,7 @@
 #define __WDESTRUCTIBLEELEMENT_H_INCLUDED__
 
 #include <iostream>
+#include "Node.h"
 
 struct WDestructibleElement
 {
@@ -21,7 +22,7 @@ struct WDestructibleElement
 };
 
 
-bool WDestructibleElement::operator< (const WDestructibleElement& e) const
+inline bool WDestructibleElement::operator< (const WDestructibleElement& e) const
 {
     if (futureNode->getLevel() == e.futureNode->getLevel())
     {
@@ -33,13 +34,12 @@ bool WDestructibleElement::operator< (const WDestructibleElement& e) const
     }
 }
 
-bool WDestructibleElement::operator== (const WDestructibleElement& e) const
+inline bool WDestructibleElement::operator== (const WDestructibleElement& e) const
 {
-
     return pixelPosition == e.pixelPosition;
 }
 
-WDestructibleElement& WDestructibleElement::operator=
+inline WDestructibleElement& WDestructibleElement::operator=
     (const WDestructibleElement& e)
 {
     pixelPosition = e.pixelPosition;
@@ -47,8 +47,7 @@ WDestructibleElement& WDestructibleElement::operator=
     return *this;
 }
 
-
-void WDestructibleElement::printMe() const
+inline void WDestructibleElement::printMe() const
 {
     std::cout << "Pixel position: " << pixelPosition << " - Node level: "
          << futureNode->getLevel() << std::endl;
