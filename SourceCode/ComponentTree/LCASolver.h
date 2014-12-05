@@ -6,14 +6,13 @@
 #include <stdexcept>
 #include "Node.h"
 
-typedef map<pair<unsigned int,unsigned int>, unsigned short> SparceTable;
-
 class LCASolver
 {
 public:
     LCASolver(Node *root);
-    LCASolver(LCASolver&) : root(0), eulerTour(), representatives(), tc()
+    LCASolver(LCASolver&) : root(0), eulerTour(), representatives(), tc(0)
         { throw std::runtime_error("Not implemented yet!"); }
+    ~LCASolver() { if(tc != 0) delete[] tc; tc = 0; }
     LCASolver& operator=(const LCASolver&)
     { throw std::runtime_error("Not implemented yet!"); }
 
@@ -28,7 +27,7 @@ private:
     Node* root;
     std::vector<Node*> eulerTour;
     std::map<Node*,unsigned int> representatives;
-    SparceTable tc;
+    unsigned short* tc;
 };
 
 #endif // __LCASOLVER_H_INCLUDED__
