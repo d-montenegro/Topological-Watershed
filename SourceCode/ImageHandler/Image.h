@@ -69,6 +69,11 @@ public:
      */
     virtual set<unsigned int> getLowerNeighbors(unsigned int pixelPosition) const = 0;
 
+    /*
+     * Decrement pixel value by position
+     */
+    void decrementPixel(unsigned int pixelPosition);
+
     void printMe()
     {
         for(unsigned int index = 0; index < pixels.size(); index++)
@@ -86,7 +91,10 @@ public:
     unsigned int getHeight() const { return height; }
     ushort getLowestGreyIntensity() const { return lowestGreyIntensity; }
     ushort getHighestGreyIntensity() const { return highestGreyIntensity; }
-    void setPixelValue(unsigned int pixelPosition, ushort newGreyValue) { pixels.at(pixelPosition) = newGreyValue; }
+    void setPixelValue(unsigned int pixelPosition, ushort newGreyValue)
+    {
+        pixels.at(pixelPosition) = newGreyValue;
+    }
 
 protected:
     vector<ushort> pixels;
@@ -95,5 +103,14 @@ protected:
     ushort lowestGreyIntensity;
     ushort highestGreyIntensity;
 };
+
+inline void Image::decrementPixel(unsigned int pixelPosition)
+{
+    if(pixels.at(pixelPosition) == lowestGreyIntensity)
+    {
+        throw invalid_argument("already a minimum");
+    }
+    pixels.at(pixelPosition) = pixels.at(pixelPosition) - 1;
+}
 
 #endif // __IMAGE_H_INCLUDED__

@@ -290,3 +290,60 @@ void doTopologicalWatershedOnBorder(Image& image,
         }
     }
 }
+
+
+
+/**************************** NAIVE IMPLEMENTATION **************************/
+bool isWDestructible(const Image& image, unsigned int pixelPosition)
+{
+    set<unsigned int> neighbors = image.getLowerNeighbors(pixelPosition);
+    if(neighbors.empty())
+    {
+        return false;
+    }
+    if(neighbors.size() == 1)
+    {
+        return true;
+    }
+
+    vector<unsigned int> reachablePoints;
+    reachablePoints.push_back(*neighbors.begin());
+    neighbors.erase(neighbors.begin());
+    unsigned int index = 0;
+
+    while(!neighbors.empty() && index < reachablePoints.size())
+    {
+        for(auto& neighborPosition : image.getNeighbors(reachablePoints.at(index)))
+        {
+            if(image.getPixels().at(neighborPosition) < image.getPixels().at(pixelPosition)
+                    && reachablePoints.end() ==
+                    find(reachablePoints.begin(),reachablePoints.end(),neighborPosition))
+            {
+                reachablePoints.push_back(neighborPosition);
+                neighbors.erase(neighborPosition);
+            }
+        }
+        index++;
+    }
+
+    return neighbors.empty();
+}
+
+void doNaiveTopologicalWatershed(Image& image)
+{
+    bool someChange = false;
+    unsigned int totalPixels = image.getPixels().size();
+    do
+    {
+        someChange = false;
+        for(unsigned int i = 0; i < totalPixels; i++)
+        {
+            if(isWDestructible(image,i))
+            {
+                image.decrementPixel(i);
+                someChange = true;
+            }
+        }
+    } while(someChange);
+}
+

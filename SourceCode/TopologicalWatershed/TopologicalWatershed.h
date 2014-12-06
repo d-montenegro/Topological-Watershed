@@ -4,6 +4,8 @@
 #include "Image.h"
 #include "ComponentTree.h"
 
+void doNaiveTopologicalWatershed(Image& image);
+
 void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree);
 
 void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
