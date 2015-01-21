@@ -9,7 +9,8 @@ set(TopologicalWatershed_VERSION_MINOR 0)
 option(UNITTEST "Tests." ON)
 
 # compilation flags
-SET(CMAKE_CXX_FLAGS  "-Wall -Wextra -ansi -pedantic -Weffc++ -gdwarf-3 -std=c++11 -Wl,--no-as-needed -pthread")
+SET(CMAKE_CXX_FLAGS_DEBUG  "-Wall -Wextra -ansi -pedantic -Weffc++ -gdwarf-3 -std=c++11 -Wl,--no-as-needed -pthread")
+SET(CMAKE_CXX_FLAGS_RELEASE  "-O3 -std=c++11 -Wl,--no-as-needed -pthread")
 
 # headers
 include_directories(${CMAKE_SOURCE_DIR}/DisjointSetCollection)

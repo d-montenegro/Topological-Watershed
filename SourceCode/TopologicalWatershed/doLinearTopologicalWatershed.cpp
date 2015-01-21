@@ -21,7 +21,7 @@ void printUsage(string binaryName)
             " -in <source_image_path> -f <source_image_format> -out <dest_image_path>\
  -r <neighbor_relation>" << endl  << endl
          << "source_image_path is the path to a greyscale" << endl
-         << "source_image_format is the format of the source image, may be JPG, JPEG or PNG" << endl
+         << "source_image_format is the format of the source image, may be JPG, JPEG, PNG or PGM" << endl
          << "dest_image_path is the path where the processed image will be wrote" << endl
          << "neigbor_relation may be 4 for 4-neighbor relation type, or 8 "
          << "for 8-neighbor relation type" << endl << endl;
@@ -58,6 +58,10 @@ int main(int argc, char* argv[])
             else if(strcmp(argv[i+1],"PNG") == 0)
             {
                 format = PNG;
+            }
+            else if(strcmp(argv[i+1],"PGM") == 0)
+            {
+                format = PGM;
             }
             else
             {
@@ -125,7 +129,7 @@ int main(int argc, char* argv[])
             (double)difftime(end,start) << " sec" << endl;
 
     writeImage(destinationImage,format,image->getPixels(),
-               image->getWidth(),image->getWidth());
+               image->getWidth(),image->getHeight());
 
     delete image;
     return 0;

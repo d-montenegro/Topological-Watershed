@@ -43,8 +43,10 @@ void LCASolver::buildSparceTable()
 
 void LCASolver::calculateRepresentatives()
 {
+    unsigned int totalNodes = (eulerTour.size() + 1) / 2;
     unsigned int pos = 0;
-    for (vector<Node*>::iterator it = eulerTour.begin(); it != eulerTour.end(); ++it)
+    for (vector<Node*>::iterator it = eulerTour.begin();
+         representatives.size() < totalNodes; ++it)
     {
         if (representatives.find(*it) == representatives.end())
         {

@@ -18,6 +18,12 @@ void writeJpgImage(const std::string& imagePath, const std::vector<ushort>& pixe
 void writePngImage(const std::string& imagePath, const std::vector<ushort>& pixels,
                   unsigned int width, unsigned int height);
 
+void readPGMImage(const string& imgPath, vector<ushort>& image,
+        unsigned int& width, unsigned int& height, unsigned int& maxValue);
+
+void writePGMImage(const string& imgPath, const vector<ushort>& image,
+        unsigned int width, unsigned int height, unsigned int maxValue);
+
 void readImage(const std::string& imagePath, IMAGE_FORMAT format,
                std::vector<ushort>& pixels, unsigned int& width,
                unsigned int& height)
@@ -32,6 +38,12 @@ void readImage(const std::string& imagePath, IMAGE_FORMAT format,
     {
         pixels.clear();
         readPngImage(imagePath, pixels, width, height);
+    }
+    else if(format == PGM)
+    {
+        pixels.clear();
+        unsigned int maxValue = 0;
+        readPGMImage(imagePath,pixels,width,height,maxValue);
     }
     else
     {
@@ -50,6 +62,10 @@ void writeImage(const std::string& imagePath, IMAGE_FORMAT format,
     else if (format == PNG)
     {
         writePngImage(imagePath, pixels, width, height);
+    }
+    else if(format == PGM)
+    {
+        writePGMImage(imagePath,pixels,width,height,255); // reveer lo del 255
     }
     else
     {
@@ -186,5 +202,88 @@ void writePngImage(const std::string& imagePath, const std::vector<ushort>& pixe
     {
         throw runtime_error("Could not write on: \"" + imagePath +
                             "\". Reason: " + string(e.what()));
+    }
+}
+
+void readPGMImage(const string& imgPath, vector<ushort>& image,
+        unsigned int& width, unsigned int& height, unsigned int& maxValue)
+{
+    image.clear();
+    ifstream pgmImage(imgPath.c_str(),ios::binary);
+    if (pgmImage.is_open())
+    {
+        // get image type (P5 means binary and P2 means ASCII)
+        string type;
+        pgmImage >> type;
+        if(type != "P2" && type != "P5")
+        {
+            throw invalid_argument("Only type P2 and P5 are supported");
+        }
+
+        // read width
+        pgmImage >> width;
+
+        // read height
+        pgmImage >> height;
+
+        // read maxValue
+        pgmImage >> maxValue;
+
+        if(maxValue != 255)
+        {
+            throw invalid_argument("Only 255 grey values are supported");
+        }
+
+        if(type == "P5")
+        {
+            // it's binary type
+            unsigned char c = ' ';
+            while(pgmImage >> c)
+            {
+                image.push_back(c);
+            }
+        }
+        else
+        {
+            // it's plain type
+            unsigned int n = 0;
+            while (pgmImage >> n)
+            {
+                image.push_back(n);
+            }
+        }
+
+        pgmImage.close();
+    }
+    else
+    {
+        throw invalid_argument("Could not read " + imgPath);
+    }
+}
+
+void writePGMImage(const string& imgPath, const vector<ushort>& image,
+        unsigned int width, unsigned int height, unsigned int maxValue)
+{
+    ofstream pgmImage;
+    pgmImage.open(imgPath.c_str());
+    if (pgmImage.is_open())
+    {
+        pgmImage << "P2" << endl;
+        pgmImage << width << " " << height << endl;
+        pgmImage << maxValue << endl;
+        for(unsigned int i = 0; i < image.size() - 1; i++)
+        {
+            if(i != 0 && i % width == 0)
+            {
+                pgmImage << endl;
+            }
+            pgmImage << image.at(i) << " ";
+        }
+        pgmImage << image.at(image.size() - 1) << endl;
+        pgmImage.close();
+    }
+    else
+    {
+        throw invalid_argument("Could not write " + imgPath);
     }
 }

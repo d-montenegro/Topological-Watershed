@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
             (double)difftime(end,start) << " sec" << endl;
 
     writeImage(destinationImage,format,image->getPixels(),
-               image->getWidth(),image->getWidth());
+               image->getWidth(),image->getHeight());
 
     delete image;
     return 0;
