@@ -110,6 +110,18 @@ vector<short> lowerCompletion(const Image& image)
 
 } // anonymous namespace
 
+enum PIXEL_TYPE
+{
+    MINIMUM = 0,
+    SEPARATING,
+    INNER,
+    PLATEAU,
+    FUTURE_MINIMUM,
+    FUTURE_SEPARATING,
+    FUTURE_INNER,
+    FUTURE_PLATEAU
+};
+
 // global variable to be used by parallel topological watershed
 mutex m; // controlling mutex
 set<unsigned int> pendingBorderPoints;
@@ -126,7 +138,7 @@ set<unsigned int> pendingInnerPoints;
 
 
 Node* wDestructible(const Image& image, ComponentTree& componentTree,
-                    unsigned int pixelPosition, bool& isSeparating);
+                    unsigned int pixelPosition, PIXEL_TYPE& type);
 
 void processWDestructibleElement(Image& image, ComponentTree& componentTree,
                                  WDestructibleElement& element,
@@ -156,15 +168,15 @@ void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
     WDestructibleElementsCollection wDestructibleElements(imageSize);
     for (unsigned int currentPixel = 0; currentPixel < imageSize; currentPixel++)
     {
-        bool isSeparating = false;
-        Node* node = wDestructible(image,componentTree,currentPixel,isSeparating);
+        PIXEL_TYPE type = MINIMUM;
+        Node* node = wDestructible(image,componentTree,currentPixel,type);
         if (node)
         {
             wDestructibleElements.addElement(WDestructibleElement(currentPixel,
                                                                   image.at(currentPixel),
                                                                   lc.at(currentPixel),
                                                                   node,
-                                                                  isSeparating && node->getChilds().empty()));
+                                                                  type == FUTURE_MINIMUM));
         }
     }
 
@@ -231,9 +243,9 @@ void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
  * 0 es returned.
  */
 Node* wDestructible(const Image& image, ComponentTree& componentTree,
-                    unsigned int pixelPosition, bool& isSeparating)
+                    unsigned int pixelPosition, PIXEL_TYPE& type)
 {
-    isSeparating = false;
+    type = MINIMUM;
     NodeSet nodesFromNeighbor;
     set<unsigned int> neighbors = image.getLowerNeighbors(pixelPosition);
 
@@ -244,27 +256,55 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
 
     if (nodesFromNeighbor.empty())
     {
+        Node* n = componentTree.getComponent(pixelPosition);
+        if(componentTree.isLeaf(n))
+        {
+            type = MINIMUM;
+        }
+        else
+        {
+            type = PLATEAU;
+        }
         return 0;
     }
 
     if (1 == nodesFromNeighbor.size())
     {
-        return *(nodesFromNeighbor.begin());
+        Node* n = *(nodesFromNeighbor.begin());
+        if(componentTree.isLeaf(n))
+        {
+            type = FUTURE_MINIMUM;
+        }
+        else
+        {
+            type = FUTURE_PLATEAU;
+        }
+        return n;
     }
 
     Node* highestFork = componentTree.getHighestFork(nodesFromNeighbor);
 
     if (!highestFork)
     {
-        isSeparating = true;
-        return componentTree.getMinimum(nodesFromNeighbor);
+        Node* n = componentTree.getMinimum(nodesFromNeighbor);
+        if(componentTree.isLeaf(n))
+        {
+            type = FUTURE_MINIMUM;
+        }
+        else
+        {
+            type = FUTURE_PLATEAU;
+        }
+        return n;
     }
 
     if (highestFork->getLevel() <= image.at(pixelPosition))
     {
+        type = FUTURE_SEPARATING;
         return highestFork;
     }
 
+    type = SEPARATING;
     return 0;
 }
 
@@ -279,8 +319,8 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
     {
         if (element.futureNode->getLevel() <= image.at(neighbor))
         {
-            bool isSeparating = false;
-            Node* node = wDestructible(image,componentTree,neighbor,isSeparating);
+            PIXEL_TYPE type = MINIMUM;
+            Node* node = wDestructible(image,componentTree,neighbor,type);
             if (!node)
             {
                 wDestructibleElements.removeElement(neighbor);
@@ -291,7 +331,7 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
                                                                       image.at(neighbor),
                                                                       lc.at(neighbor),
                                                                       node,
-                                                                      isSeparating && node->getChilds().empty()));
+                                                                      type == FUTURE_MINIMUM));
             }
         }
     }
@@ -304,13 +344,13 @@ WDestructibleElementsCollection initializeSet(Image& image,
     WDestructibleElementsCollection elements(image.getSize());
     for (auto point : tile)
     {
-        bool isSeparating = false;
-        Node* node = wDestructible(image,componentTree,point,isSeparating);
+        PIXEL_TYPE type = MINIMUM;
+        Node* node = wDestructible(image,componentTree,point,type);
         if (node)
         {
             elements.addElement(WDestructibleElement(point,image.at(point),
                                                      lc.at(point),node,
-                                                     isSeparating && node->getChilds().empty()));
+                                                     type == FUTURE_MINIMUM));
         }
     }
 
@@ -353,8 +393,8 @@ void doTopologicalWatershedOnBorder(Image& image,
         {
             if (element.futureNode->getLevel() <= image.at(neighbor))
             {
-                bool isSeparating = false;
-                Node* node = wDestructible(image,componentTree,neighbor,isSeparating);
+                PIXEL_TYPE type = MINIMUM;
+                Node* node = wDestructible(image,componentTree,neighbor,type);
                 if (!node)
                 {
                     elements.removeElement(neighbor);
@@ -366,7 +406,7 @@ void doTopologicalWatershedOnBorder(Image& image,
                     {
                         elements.addElement(WDestructibleElement(neighbor,image.at(neighbor),
                                                                  lc.at(neighbor),node,
-                                                                 isSeparating && node->getChilds().empty()));
+                                                                 type == FUTURE_MINIMUM));
                     }
                     else
                     {

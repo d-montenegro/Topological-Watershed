@@ -25,7 +25,7 @@ vector<unsigned int> SpecialSort(const vector<ushort>& arr)
 
     std::sort(
         begin(indices), end(indices),
-        [&](ushort a, ushort b) { return arr[a] < arr[b]; }
+        [&](unsigned int a, unsigned int b) { return arr[a] < arr[b]; }
     );
     return indices;
 }

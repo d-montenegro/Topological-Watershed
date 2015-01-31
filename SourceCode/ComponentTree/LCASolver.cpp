@@ -68,17 +68,17 @@ Node* LCASolver::getLCA(Node *a, Node *b)
 {
     if(a == b)
     {
-        throw invalid_argument("a are b must be different");
+        throw invalid_argument("a and b must be different");
     }
     return eulerTour.at(getLevelRMQ(representatives.at(a),representatives.at(b)));
 }
 
-unsigned short LCASolver::getLevelRMQ(unsigned int position1, unsigned int position2)
+unsigned short LCASolver::getLevelRMQ(size_t position1, size_t position2)
 {
     // position1 must be the lower value, so swapping if needed
     if(position1 > position2)
     {
-        unsigned short tmp = position1;
+        size_t tmp = position1;
         position1 = position2;
         position2 = tmp;
     }

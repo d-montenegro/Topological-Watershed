@@ -20,12 +20,12 @@ public:
 
 private:
     void doEulerTour(Node* node);
-    unsigned short getLevelRMQ(unsigned int position1, unsigned int position2);
+    unsigned short getLevelRMQ(size_t position1, size_t position2);
     void buildSparceTable();
 
     Node* root;
     std::vector<Node*> eulerTour;
-    std::unordered_map<Node*,unsigned int> representatives;
+    std::unordered_map<Node*,size_t> representatives;
     unsigned short* tc;
 };
 
