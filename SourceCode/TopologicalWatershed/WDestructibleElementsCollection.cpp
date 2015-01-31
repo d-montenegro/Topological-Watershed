@@ -6,7 +6,22 @@ using namespace std;
 
 void WDestructibleElementsCollection::addElement(const WDestructibleElement& element)
 {
-    removeElement(element.pixelPosition);
+    if(elementPresent.at(element.pixelPosition))
+    {
+        multiset<WDestructibleElement>::iterator it =
+                find_if(collection.begin(),collection.end(),
+                [&](const WDestructibleElement& e)
+                {
+                    return e.pixelPosition == element.pixelPosition;
+                });
+        if(*it == element)
+        {
+            // element already present at collection
+            return;
+        }
+        // remove obsolete element to add the updated one
+        collection.erase(it);
+    }
     collection.insert(element);
     elementPresent.at(element.pixelPosition) = true;
 }
@@ -24,7 +39,7 @@ void WDestructibleElementsCollection::removeElement(unsigned int pixelPosition)
 {
     if(elementPresent.at(pixelPosition))
     {
-        set<WDestructibleElement>::iterator it =
+        multiset<WDestructibleElement>::iterator it =
                 find_if(collection.begin(),collection.end(),
                 [&](const WDestructibleElement& e)
                 {

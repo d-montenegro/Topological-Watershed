@@ -40,24 +40,9 @@ void LCASolver::buildSparceTable()
     }
 }
 
-
-void LCASolver::calculateRepresentatives()
-{
-    unsigned int totalNodes = (eulerTour.size() + 1) / 2;
-    unsigned int pos = 0;
-    for (vector<Node*>::iterator it = eulerTour.begin();
-         representatives.size() < totalNodes; ++it)
-    {
-        if (representatives.find(*it) == representatives.end())
-        {
-            representatives[*it] = pos;
-        }
-        pos++;
-    }
-}
-
 void LCASolver::doEulerTour(Node* node)
 {
+    representatives[node] = eulerTour.size();
     eulerTour.push_back(node);
     NodeSet childs = node->getChilds();
     for (NodeSet::iterator it = childs.begin(); it != childs.end(); ++it)
@@ -76,7 +61,6 @@ LCASolver::LCASolver(Node* root) : root(root), eulerTour(), representatives(),
     }
 
     doEulerTour(root);
-    calculateRepresentatives();
     buildSparceTable();
 }
 

@@ -70,37 +70,38 @@ ComponentTree::~ComponentTree()
 // TODO: split this method in several ones
 void ComponentTree::buildComponentTree(const Image& image)
 {
+    unsigned int totalPixels = image.getSize();
+
     // stores all the partial trees being made during component tree building
     DisjointSetCollection partialTrees;
 
     // stores the root of each partial tree
-    vector<unsigned int> partialTreeRoot;
+    vector<unsigned int> partialTreeRoot(totalPixels,0);
 
     // stores the canonical element of each partial tree
     DisjointSetCollection canonicalElements;
-    vector<Node*> nodes;
+    vector<Node*> nodes(totalPixels,0);
 
-    vector<ushort> pixels = image.getPixels();
-    unsigned int totalPixels = pixels.size();
-    totalNodes = totalPixels;
     for (unsigned int pixelPosition = 0; pixelPosition < totalPixels;
          pixelPosition++)
     {
         // create a node for each pixel
-        nodes.push_back(new Node(pixels.at(pixelPosition) + 1));
+        nodes.at(pixelPosition) = new Node(image.at(pixelPosition) + 1);
 
         // initialize partial trees
-        partialTreeRoot.push_back(pixelPosition);
+        partialTreeRoot.at(pixelPosition) = pixelPosition;
         partialTrees.addNewSet(pixelPosition);
         canonicalElements.addNewSet(pixelPosition);
     }
 
-    set<unsigned int> alreadyProcessed;
+    totalNodes = totalPixels;
+
+    vector<bool> alreadyProcessed(totalPixels,false);
     vector<unsigned int> orderedPixels = SpecialSort(image.getPixels());
     for (auto& currentPixel : orderedPixels)
     {
         // mark pixel as processed
-        alreadyProcessed.insert(currentPixel);
+        alreadyProcessed.at(currentPixel) = true;
 
         // Get the partial tree the current pixel belongs to
         unsigned int currentPartialTree = partialTrees.find(currentPixel);
@@ -115,7 +116,7 @@ void ComponentTree::buildComponentTree(const Image& image)
         set<unsigned int> neighbors = image.getLowerOrEqualNeighbors(currentPixel);
         for (auto& currentNeighbor :  neighbors)
         {
-            if (alreadyProcessed.find(currentNeighbor) == alreadyProcessed.end())
+            if (!alreadyProcessed.at(currentNeighbor))
             {
                 continue;
             }

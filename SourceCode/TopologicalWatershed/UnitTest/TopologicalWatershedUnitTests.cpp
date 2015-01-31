@@ -60,7 +60,6 @@ TEST(NaiveTopologicalWatershed, performTopologicalWatershedOnSynteticImage_3)
 
     ImageFourNeighborType image(pixels,5,5);
     doNaiveTopologicalWatershed(image);
-    image.printMe();
 
     vector<ushort> expectedResult = { 1,1,1,1,1,
                                       1,1,1,1,1,
@@ -136,7 +135,6 @@ TEST(NaiveTopologicalWatershed, performTopologicalWatershedOnSynteticImage_6)
                                       0,0,9,0,0,0,8,2,2,2,5,3,3 };
 
     ASSERT_EQ(expectedResult,image.getPixels());
-
 }
 
 /*****************************************************************************
@@ -246,9 +244,9 @@ TEST(LinearTopologicalWatershed, performTopologicalWatershedOnSynteticImage_5)
     doLinearTopologicalWatershed(image, tree);
 
     vector<ushort> expectedResult = { 0,0,0,0,2,0,0,0,0,
-                                      0,0,0,0,0,2,0,0,0,
-                                      0,0,3,0,0,0,2,0,0,
-                                      0,3,1,3,0,2,1,2,0,
+                                      0,0,0,0,2,0,0,0,0,
+                                      0,0,3,0,2,0,2,0,0,
+                                      0,3,1,3,2,2,1,2,0,
                                       0,0,3,0,2,0,2,0,0,
                                       0,0,0,0,2,0,0,0,0 };
 
@@ -269,16 +267,42 @@ TEST(LinearTopologicalWatershed, performTopologicalWatershedOnSynteticImage_6)
     ComponentTree tree(image);
     doLinearTopologicalWatershed(image, tree);
 
+    image.printMe();
+
     vector<ushort> expectedResult = { 0,9,0,0,0,0,8,2,2,2,5,3,3,
                                       0,9,5,5,0,0,0,8,2,2,2,5,3,
                                       0,9,1,1,7,0,0,8,2,2,5,3,3,
-                                      0,0,9,7,0,7,0,8,2,2,2,5,3,
+                                      0,0,9,7,0,7,8,2,2,2,5,3,3,
                                       0,9,0,0,0,0,8,2,2,2,2,5,3,
                                       0,0,9,0,0,0,8,2,2,2,2,5,3 };
 
     ASSERT_EQ(expectedResult,image.getPixels());
 
 }
+
+TEST(LinearTopologicalWatershed, performTopologicalWatershedOnSynteticImage_7)
+{
+    vector<ushort> pixels = { 255,255,255,255,255,
+                              255,63,61,59,58,
+                              255,58,57,56,56,
+                              255,57,58,57,56,
+                              255,56,57,57,56 };
+
+    ImageFourNeighborType image(pixels,5,5);
+    ComponentTree tree(image);
+
+    doLinearTopologicalWatershed(image, tree);
+
+    vector<ushort> expectedResult = { 56,56,56,56,56,
+                                      56,56,56,56,56,
+                                      57,56,56,56,56,
+                                      56,57,56,56,56,
+                                      56,56,57,56,56 };
+
+    ASSERT_EQ(expectedResult,image.getPixels());
+
+}
+
 
 /*****************************************************************************
   PARALLEL TOPOLOGICAL WATERSGED TESTS

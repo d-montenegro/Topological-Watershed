@@ -2,7 +2,7 @@
 #define __DISJOINTSETCOLLECTION_H_INCLUDED__
 
 #include <set>
-#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -32,7 +32,7 @@ public:
     unsigned int linkSets(unsigned int element1, unsigned int element2);
 
 private:
-    map<unsigned int, Element*> disjointSet;
+    unordered_map<unsigned int, Element*> disjointSet;
 };
 
 #endif // __DISJOINTSETCOLLECTION_H_INCLUDED__

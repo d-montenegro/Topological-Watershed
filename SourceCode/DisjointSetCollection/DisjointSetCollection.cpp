@@ -25,22 +25,28 @@ DisjointSetCollection::~DisjointSetCollection()
 
 void DisjointSetCollection::addNewSet(unsigned int element)
 {
-    if (disjointSet.count(element) > 0)
+    Element* e = new Element(element);
+    if(!disjointSet.insert(
+                pair<unsigned int,Element*>(element,e)).second)
     {
+        delete e;
+        e = 0;
         throw invalid_argument("element already exists");
     }
-
-    disjointSet[element] = new Element(element);
 }
 
 unsigned int DisjointSetCollection::find(unsigned int element)
 {
-    if (0 == disjointSet.count(element))
+    Element* setElement = 0;
+    try
+    {
+        setElement = disjointSet.at(element);
+    }
+    catch(out_of_range e)
     {
         throw invalid_argument("element does not exists");
     }
 
-    Element* setElement = disjointSet[element];
     if (setElement->father != element)
     {
         setElement->father = find(setElement->father);
@@ -50,16 +56,6 @@ unsigned int DisjointSetCollection::find(unsigned int element)
 
 unsigned int DisjointSetCollection::linkSets(unsigned int element1, unsigned int element2)
 {
-    if (0 == disjointSet.count(element1))
-    {
-        throw invalid_argument("element does not exists");
-    }
-
-    if (0 == disjointSet.count(element2))
-    {
-        throw invalid_argument("element does not exists");
-    }
-
     const unsigned int canonicalElement1 = find(element1);
     const unsigned int canonicalElement2 = find(element2);
 
@@ -68,8 +64,8 @@ unsigned int DisjointSetCollection::linkSets(unsigned int element1, unsigned int
         throw invalid_argument("elements already belongs to the same set");
     }
 
-    Element* setCanonicalElement1 = disjointSet[canonicalElement1];
-    Element* setCanonicalElement2 = disjointSet[canonicalElement2];
+    Element* setCanonicalElement1 = disjointSet.at(canonicalElement1);
+    Element* setCanonicalElement2 = disjointSet.at(canonicalElement2);
 
     if (setCanonicalElement1->ranking > setCanonicalElement2->ranking)
     {

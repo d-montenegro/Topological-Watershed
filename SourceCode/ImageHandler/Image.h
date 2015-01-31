@@ -91,6 +91,8 @@ public:
     unsigned int getHeight() const { return height; }
     ushort getLowestGreyIntensity() const { return lowestGreyIntensity; }
     ushort getHighestGreyIntensity() const { return highestGreyIntensity; }
+    unsigned int getSize() const { return pixels.size(); }
+    ushort at(unsigned int position) const { return pixels.at(position); }
     void setPixelValue(unsigned int pixelPosition, ushort newGreyValue)
     {
         pixels.at(pixelPosition) = newGreyValue;

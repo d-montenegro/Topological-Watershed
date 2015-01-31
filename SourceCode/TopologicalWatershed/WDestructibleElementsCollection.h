@@ -41,7 +41,7 @@ public:
     bool isPresent(unsigned int pixelPosition) { return elementPresent.at(pixelPosition); }
 
 private:
-    std::set<WDestructibleElement> collection;
+    std::multiset<WDestructibleElement> collection;
     std::vector<bool> elementPresent;
 };
 

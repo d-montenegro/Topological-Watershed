@@ -314,3 +314,115 @@ TEST(LCASolverTest, checkLCASolver)
     delete i;
     delete j;
 }
+
+
+TEST(ComponentTreeTest, checkComponentTree_2) {
+    vector<ushort> pixels = { 255,255,255,255,255,
+                              255,63,61,59,58,
+                              255,58,57,56,56,
+                              255,57,58,57,56,
+                              255,56,57,57,56 };
+
+    ImageFourNeighborType image(pixels,5,5);
+    ComponentTree tree(image);
+
+    ASSERT_EQ(8,tree.getTotalNodes());
+
+    Node *z = tree.getComponentMapping().at(0);
+    Node *i = tree.getComponentMapping().at(6);
+    Node *g = tree.getComponentMapping().at(7);
+    Node *e = tree.getComponentMapping().at(8);
+    Node *d = tree.getComponentMapping().at(9);
+    Node *c = tree.getComponentMapping().at(12);
+    Node *b = tree.getComponentMapping().at(13);
+    Node *a = tree.getComponentMapping().at(21);
+
+    ASSERT_EQ(vector<ushort>({ 0,1,2,3,4,5,10,15,20 }),
+        getComponent(tree.getComponentMapping(),z));
+
+    ASSERT_EQ(vector<ushort>({ 6 }),
+        getComponent(tree.getComponentMapping(),i));
+
+    ASSERT_EQ(vector<ushort>({ 7 }),
+        getComponent(tree.getComponentMapping(),g));
+
+    ASSERT_EQ(vector<ushort>({ 8 }),
+        getComponent(tree.getComponentMapping(),e));
+
+    ASSERT_EQ(vector<ushort>({ 9,11,17 }),
+        getComponent(tree.getComponentMapping(),d));
+
+    ASSERT_EQ(vector<ushort>({ 12,16,18,22,23 }),
+        getComponent(tree.getComponentMapping(),c));
+
+    ASSERT_EQ(vector<ushort>({ 13,14,19,24 }),
+        getComponent(tree.getComponentMapping(),b));
+
+    ASSERT_EQ(vector<ushort>({ 21 }),
+        getComponent(tree.getComponentMapping(),a));
+
+    ASSERT_NE(z,a);
+    ASSERT_NE(z,b);
+    ASSERT_NE(z,c);
+    ASSERT_NE(z,d);
+    ASSERT_NE(z,e);
+    ASSERT_NE(z,g);
+    ASSERT_NE(z,i);
+
+    ASSERT_NE(i,a);
+    ASSERT_NE(i,b);
+    ASSERT_NE(i,c);
+    ASSERT_NE(i,d);
+    ASSERT_NE(i,e);
+    ASSERT_NE(i,g);
+
+    ASSERT_NE(g,a);
+    ASSERT_NE(g,b);
+    ASSERT_NE(g,c);
+    ASSERT_NE(g,d);
+    ASSERT_NE(g,e);
+
+    ASSERT_NE(e,a);
+    ASSERT_NE(e,b);
+    ASSERT_NE(e,c);
+    ASSERT_NE(e,d);
+
+    ASSERT_NE(d,a);
+    ASSERT_NE(d,b);
+    ASSERT_NE(d,c);
+
+    ASSERT_NE(c,a);
+    ASSERT_NE(c,b);
+
+    ASSERT_NE(b,a);
+
+    ASSERT_EQ(z,tree.getRoot());
+
+    ASSERT_EQ(1,z->getChilds().size());
+    ASSERT_EQ(i,*z->getChilds().begin());
+
+    ASSERT_EQ(1,i->getChilds().size());
+    ASSERT_EQ(g,*i->getChilds().begin());
+
+    ASSERT_EQ(1,g->getChilds().size());
+    ASSERT_EQ(e,*g->getChilds().begin());
+
+    ASSERT_EQ(1,e->getChilds().size());
+    ASSERT_EQ(d,*e->getChilds().begin());
+
+    ASSERT_EQ(1,d->getChilds().size());
+    ASSERT_EQ(c,*d->getChilds().begin());
+
+    ASSERT_EQ(2,c->getChilds().size());
+    ASSERT_TRUE(c->getChilds().find(a) != c->getChilds().end());
+    ASSERT_TRUE(c->getChilds().find(b) != c->getChilds().end());
+
+    ASSERT_EQ(0,b->getChilds().size());
+    ASSERT_EQ(0,a->getChilds().size());
+
+    NodeSet aAndb = {a,b};
+    ASSERT_EQ(c,tree.getHighestFork(aAndb));
+
+    NodeSet eAndg = {e,g};
+    ASSERT_EQ(0,tree.getHighestFork(eAndg));
+}

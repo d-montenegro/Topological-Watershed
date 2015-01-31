@@ -7,10 +7,13 @@
 struct WDestructibleElement
 {
     unsigned int pixelPosition;
-    mutable Node* futureNode;
+    unsigned short pixelValue;
+    unsigned short priority;
+    Node* futureNode;
+    bool isMinimal;
 
-    WDestructibleElement(unsigned int pixelPosition, Node* node) :
-        pixelPosition(pixelPosition), futureNode(node) {}
+    WDestructibleElement(unsigned int pixelPosition, unsigned short pixelValue, unsigned short priority, Node* node, bool isMinimal) :
+        pixelPosition(pixelPosition), pixelValue(pixelValue),priority(priority), futureNode(node), isMinimal(isMinimal) {}
 
     bool operator== (const WDestructibleElement& e) const;
 
@@ -24,19 +27,36 @@ struct WDestructibleElement
 
 inline bool WDestructibleElement::operator< (const WDestructibleElement& e) const
 {
-    if (futureNode->getLevel() == e.futureNode->getLevel())
+    if(isMinimal && !e.isMinimal)
     {
-        return pixelPosition < e.pixelPosition;
+        return true;
     }
-    else
+    if(!isMinimal && e.isMinimal)
     {
-        return futureNode->getLevel() < e.futureNode->getLevel();
+        return false;
     }
+    if(isMinimal && e.isMinimal)
+    {
+        if(pixelValue == e.pixelValue)
+        {
+            return priority < e.priority;
+        }
+        else
+        {
+            return pixelValue > e.pixelValue;
+        }
+    }
+
+    return futureNode->getLevel() < e.futureNode->getLevel();
 }
 
 inline bool WDestructibleElement::operator== (const WDestructibleElement& e) const
 {
-    return pixelPosition == e.pixelPosition;
+    return pixelPosition == e.pixelPosition &&
+           pixelValue == e.pixelValue &&
+           priority == e.priority &&
+           futureNode == e.futureNode &&
+           isMinimal == e.isMinimal;
 }
 
 inline WDestructibleElement& WDestructibleElement::operator=

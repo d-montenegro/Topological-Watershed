@@ -2,7 +2,7 @@
 #define __LCASOLVER_H_INCLUDED__
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <stdexcept>
 #include "Node.h"
 
@@ -20,13 +20,12 @@ public:
 
 private:
     void doEulerTour(Node* node);
-    void calculateRepresentatives();
     unsigned short getLevelRMQ(unsigned int position1, unsigned int position2);
     void buildSparceTable();
 
     Node* root;
     std::vector<Node*> eulerTour;
-    std::map<Node*,unsigned int> representatives;
+    std::unordered_map<Node*,unsigned int> representatives;
     unsigned short* tc;
 };
 
