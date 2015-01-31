@@ -12,17 +12,6 @@ using namespace std;
 namespace
 {
 
-struct ArraySorter
-{
-    vector<ushort> arr;
-    ArraySorter(const vector<ushort>& arr) : arr(arr) {}
-
-    bool operator() (unsigned int a, unsigned int b) const
-    {
-        return (arr[a] < arr[b]);
-    }
-};
-
 /*
  * Returns an array of the same size as 'arr' that contains the indexes of arr
  * sorted increasingly. Example:
@@ -31,13 +20,14 @@ struct ArraySorter
  */
 vector<unsigned int> SpecialSort(const vector<ushort>& arr)
 {
-    vector<unsigned int> result(arr.size());
+    vector<unsigned int> indices(arr.size());
+    iota(begin(indices), end(indices), static_cast<size_t>(0));
 
-    iota(result.begin(), result.end(), 0);
-
-    sort(result.begin(), result.end(), ArraySorter(arr));
-
-    return result;
+    std::sort(
+        begin(indices), end(indices),
+        [&](ushort a, ushort b) { return arr[a] < arr[b]; }
+    );
+    return indices;
 }
 
 void deleteTree(Node* root)
