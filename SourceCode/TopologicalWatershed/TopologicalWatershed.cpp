@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <thread>
 #include <mutex>
-#include <cassert>
 
 #include "Node.h"
 #include "TopologicalWatershed.h"

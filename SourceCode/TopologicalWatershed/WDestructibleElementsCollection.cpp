@@ -6,47 +6,43 @@ using namespace std;
 
 void WDestructibleElementsCollection::addElement(const WDestructibleElement& element)
 {
-    if(elementPresent.at(element.pixelPosition))
+    if(mapping.find(element.pixelPosition) != mapping.end())
     {
-        multiset<WDestructibleElement>::iterator it =
-                find_if(collection.begin(),collection.end(),
-                [&](const WDestructibleElement& e)
-                {
-                    return e.pixelPosition == element.pixelPosition;
-                });
-        if(*it == element)
+        if(mapping.at(element.pixelPosition) == element)
         {
-            // element already present at collection
             return;
         }
-        // remove obsolete element to add the updated one
-        collection.erase(it);
+        else
+        {
+            // update collection
+            collection.erase(mapping.at(element.pixelPosition));
+            collection.insert(element);
+
+            // update mapping
+            mapping.at(element.pixelPosition) = element;
+        }
     }
-    collection.insert(element);
-    elementPresent.at(element.pixelPosition) = true;
+    else
+    {
+        mapping.insert(pair<size_t,WDestructibleElement>(element.pixelPosition,element));
+        collection.insert(element);
+    }
 }
 
 void WDestructibleElementsCollection::removeElement(const WDestructibleElement& element)
 {
-    if(elementPresent.at(element.pixelPosition))
+    if(mapping.erase(element.pixelPosition) == 1)
     {
         collection.erase(element);
-        elementPresent.at(element.pixelPosition) = false;
     }
 }
 
-void WDestructibleElementsCollection::removeElement(unsigned int pixelPosition)
+void WDestructibleElementsCollection::removeElement(size_t pixelPosition)
 {
-    if(elementPresent.at(pixelPosition))
+    if(mapping.find(pixelPosition) != mapping.end())
     {
-        multiset<WDestructibleElement>::iterator it =
-                find_if(collection.begin(),collection.end(),
-                [&](const WDestructibleElement& e)
-                {
-                    return e.pixelPosition == pixelPosition;
-                });
-        collection.erase(it);
-        elementPresent.at(pixelPosition) = false;
+        collection.erase(mapping.at(pixelPosition));
+        mapping.erase(pixelPosition);
     }
 }
 
@@ -54,6 +50,6 @@ WDestructibleElement WDestructibleElementsCollection::getMinimum()
 {
     WDestructibleElement element = *collection.begin();
     collection.erase(collection.begin());
-    elementPresent.at(element.pixelPosition) = false;
+    mapping.erase(element.pixelPosition);
     return element;
 }

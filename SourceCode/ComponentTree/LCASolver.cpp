@@ -2,7 +2,6 @@
 #include <cmath>
 #include <algorithm>
 #include "LCASolver.h"
-#include <cassert>
 
 using namespace std;
 

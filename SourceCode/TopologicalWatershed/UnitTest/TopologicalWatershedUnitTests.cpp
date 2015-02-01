@@ -269,12 +269,15 @@ TEST(LinearTopologicalWatershed, performTopologicalWatershedOnSynteticImage_6)
     ComponentTree tree(image);
     doLinearTopologicalWatershed(image, tree);
 
+    image.printMe();
+
     vector<ushort> expectedResult = { 0,9,0,0,0,0,8,2,2,2,5,3,3,
-                                      0,9,5,5,0,0,8,2,2,2,5,3,3,
+                                      0,9,5,5,0,0,8,2,2,2,2,5,3,
                                       0,9,1,1,7,0,8,2,2,2,5,3,3,
-                                      0,0,9,7,0,8,2,2,2,2,5,3,3,
+                                      0,0,9,7,0,7,2,2,2,2,5,3,3,
                                       0,9,0,0,0,0,8,2,2,2,2,5,3,
                                       0,0,9,0,0,0,8,2,2,2,2,5,3 };
+
 
     ASSERT_EQ(expectedResult,image.getPixels());
 
@@ -292,8 +295,6 @@ TEST(LinearTopologicalWatershed, performTopologicalWatershedOnSynteticImage_7)
     ComponentTree tree(image);
 
     doLinearTopologicalWatershed(image, tree);
-
-    image.printMe();
 
     vector<ushort> expectedResult = { 56,56,56,56,56,
                                       56,56,56,57,57,

@@ -2,14 +2,14 @@
 #define __WDESTRUCTIBLEELEMENTSCOLLECTION_H_INCLUDED__
 
 #include "WDestructibleElement.h"
-#include <vector>
+#include <unordered_map>
 #include <set>
 
 class WDestructibleElementsCollection
 {
 public:
     WDestructibleElementsCollection(unsigned int maxSize) : collection(),
-        elementPresent(maxSize,false) {}
+        mapping() {}
     ~WDestructibleElementsCollection() {}
 
     /*
@@ -25,7 +25,7 @@ public:
     /*
      * Remove element by pixel position if exists.
      */
-    void removeElement(unsigned int pixelPosition);
+    void removeElement(size_t pixelPosition);
 
     /*
      * Returns the minimum WDestructibleElement of the collection.
@@ -38,11 +38,11 @@ public:
      */
     bool isEmpty() { return collection.empty(); }
 
-    bool isPresent(unsigned int pixelPosition) { return elementPresent.at(pixelPosition); }
+    bool isPresent(size_t pixelPosition) { return mapping.find(pixelPosition) != mapping.end(); }
 
 private:
-    std::multiset<WDestructibleElement> collection;
-    std::vector<bool> elementPresent;
+    std::set<WDestructibleElement> collection;
+    std::unordered_map<size_t,WDestructibleElement> mapping;
 };
 
 #endif // __WDESTRUCTIBLEELEMENTSCOLLECTION_H_INCLUDED__

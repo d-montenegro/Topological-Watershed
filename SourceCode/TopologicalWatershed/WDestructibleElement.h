@@ -39,14 +39,19 @@ inline bool WDestructibleElement::operator< (const WDestructibleElement& e) cons
     {
         if(pixelValue == e.pixelValue)
         {
+            if(priority == e.priority)
+            {
+                return pixelPosition < e.pixelPosition;
+            }
             return priority < e.priority;
         }
-        else
-        {
-            return pixelValue > e.pixelValue;
-        }
+        return pixelValue > e.pixelValue;
     }
 
+    if(futureNode->getLevel() == e.futureNode->getLevel())
+    {
+        return pixelPosition < e.pixelPosition;
+    }
     return futureNode->getLevel() < e.futureNode->getLevel();
 }
 
