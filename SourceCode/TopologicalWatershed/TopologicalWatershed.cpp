@@ -45,48 +45,48 @@ void addOrUpdate(set<WDestructibleElement>& elements,
     elements.insert(wDestructibleElement);
 }
 
-vector<short> lowerCompletion(const Image& image)
+vector<int> lowerCompletion(const Image& image)
 {
     unsigned int size = image.getSize();
-    vector<short> lowerCompletion(size,0);
-    queue<int> queue2;
+    vector<int> lowerCompletion(size,0);
+    queue<int> pixelsQueue;
 
     unsigned int ficticiousPixel = size+1; // should be max
     for(unsigned int i = 0; i < size; i++)
     {
         if(!image.getLowerNeighbors(i).empty())
         {
-            queue2.push(i);
+            pixelsQueue.push(i);
             lowerCompletion.at(i) = -1;
         }
     }
 
     unsigned int dist = 1;
-    queue2.push(ficticiousPixel);
+    pixelsQueue.push(ficticiousPixel);
 
-    while(!queue2.empty())
+    while(!pixelsQueue.empty())
     {
-        unsigned int p = queue2.front();
-        queue2.pop();
+        unsigned int pixel = pixelsQueue.front();
+        pixelsQueue.pop();
 
-        if(p == ficticiousPixel)
+        if(pixel == ficticiousPixel)
         {
-            if(!queue2.empty())
+            if(!pixelsQueue.empty())
             {
-                queue2.push(ficticiousPixel);
+                pixelsQueue.push(ficticiousPixel);
                 dist++;
             }
         }
         else
         {
-            lowerCompletion.at(p) = dist;
-            for(auto& q : image.getNeighbors(p))
+            lowerCompletion.at(pixel) = dist;
+            for(auto& neighbor : image.getNeighbors(pixel))
             {
-                if(image.at(q) == image.at(p) &&
-                        lowerCompletion.at(q) == 0)
+                if(image.at(neighbor) == image.at(pixel) &&
+                        lowerCompletion.at(neighbor) == 0)
                 {
-                    queue2.push(q);
-                    lowerCompletion.at(q) = -1;
+                    pixelsQueue.push(neighbor);
+                    lowerCompletion.at(neighbor) = -1;
                 }
             }
         }
@@ -121,10 +121,10 @@ enum PIXEL_TYPE
     FUTURE_PLATEAU
 };
 
-// global variable to be used by parallel topological watershed
+// global variables to be used by parallel topological watershed
 mutex m; // controlling mutex
 set<unsigned int> pendingBorderPoints;
-vector<short> lc;
+set<unsigned int> pendingInnerPoints;
 
 void doBorderPointInsertion(unsigned int number)
 {
@@ -132,57 +132,60 @@ void doBorderPointInsertion(unsigned int number)
     pendingBorderPoints.insert(number);
 }
 
-// global variable to be used by parallel topological watershed
-set<unsigned int> pendingInnerPoints;
-
-
 Node* wDestructible(const Image& image, ComponentTree& componentTree,
                     unsigned int pixelPosition, PIXEL_TYPE& type);
 
 void processWDestructibleElement(Image& image, ComponentTree& componentTree,
                                  WDestructibleElement& element,
-                                 WDestructibleElementsCollection& wDestructibleElements);
+                                 WDestructibleElementsCollection& wDestructibleElements,
+                                 const vector<int>& priority);
 
 WDestructibleElementsCollection initializeSet(Image& image,
                                         ComponentTree& componentTree,
-                                        const Tile& tile);
+                                        const set<unsigned int> &pixelsToProcess,
+                                        const vector<int>& priority);
 
 vector<Tile> divideImageInTiles(Image&, ushort);
 
 void doTopologicalWatershedOnTile(Image& image,
                                   ComponentTree& componentTree,
                                   const Tile& tile,
-                                  const Tile pixelsToProcess);
+                                  const set<unsigned int> pixelsToProcess,
+                                  const vector<int>& priority);
 
 void doTopologicalWatershedOnBorder(Image& image,
-                                    ComponentTree& componentTree);
+                                    ComponentTree& componentTree,
+                                    const vector<int>& priority);
 
 /*
  * Performs the Topological Watershed in cuasi-lineal time
  */
 void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
 {
+    vector<int> priority = lowerCompletion(image);
+    WDestructibleElementsCollection wDestructibleElements;
+
     size_t imageSize = image.getSize();
-    lc = lowerCompletion(image);
-    WDestructibleElementsCollection wDestructibleElements(imageSize);
     for (unsigned int currentPixel = 0; currentPixel < imageSize; currentPixel++)
     {
         PIXEL_TYPE type = MINIMUM;
         Node* node = wDestructible(image,componentTree,currentPixel,type);
         if (node)
         {
-            wDestructibleElements.addElement(WDestructibleElement(currentPixel,
-                                                                  image.at(currentPixel),
-                                                                  lc.at(currentPixel),
-                                                                  node,
-                                                                  type == FUTURE_MINIMUM));
+            wDestructibleElements.addElement(
+                        WDestructibleElement(currentPixel,
+                                             image.at(currentPixel),
+                                             priority.at(currentPixel),
+                                             node,
+                                             type == FUTURE_MINIMUM));
         }
     }
 
     while(!wDestructibleElements.isEmpty())
     {
         WDestructibleElement element = wDestructibleElements.getMinimum();
-        processWDestructibleElement(image,componentTree,element,wDestructibleElements);
+        processWDestructibleElement(image,componentTree,element,
+                                    wDestructibleElements,priority);
     }
 }
 
@@ -192,12 +195,15 @@ void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
 void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
                                     ushort numberOfThreads)
 {
+    if(numberOfThreads < 2)
+    {
+        throw invalid_argument("Invalid number of threads");
+    }
+
     pendingBorderPoints.clear();
     pendingInnerPoints.clear();
 
-    lc = lowerCompletion(image);
-
-    // TODO: check for possible values of variable numberOfThreads!
+    vector<int> priority = lowerCompletion(image);
     vector<Tile>tiles = divideSquareIntoTiles(image.getWidth(),image.getHeight(),
                                               numberOfThreads);
 
@@ -205,13 +211,14 @@ void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
     for_each(tiles.begin(),tiles.end(),[&] (Tile& tile)
     {
          threadPool.push_back(thread(doTopologicalWatershedOnTile,ref(image),
-                                     ref(componentTree),ref(tile),tile));
+                                     ref(componentTree),ref(tile),tile.points,
+                                     ref(priority)));
     });
 
     // wait for all threads to finish
     for_each(threadPool.begin(),threadPool.end(),[](thread& t) { t.join(); } );
 
-    doTopologicalWatershedOnBorder(image,componentTree);
+    doTopologicalWatershedOnBorder(image,componentTree,priority);
 
     while(!pendingInnerPoints.empty())
     {
@@ -219,12 +226,13 @@ void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
         threadPool.clear();
 
         for_each(tiles.begin(),tiles.end(),[&](Tile& tile) {
-            Tile intersection;
-            set_intersection(tile.begin(),tile.end(),
+            set<unsigned int> intersection;
+            set_intersection(tile.points.begin(),tile.points.end(),
                           pendingInnerPoints.begin(),pendingInnerPoints.end(),
                           inserter(intersection,intersection.begin()));
             threadPool.push_back(thread(doTopologicalWatershedOnTile,ref(image),
-                                     ref(componentTree),ref(tile),intersection));
+                                     ref(componentTree),ref(tile),intersection,
+                                     ref(priority)));
         });
 
         // wait for all threads to finish
@@ -232,7 +240,7 @@ void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
 
         pendingInnerPoints.clear();
 
-        doTopologicalWatershedOnBorder(image,componentTree);
+        doTopologicalWatershedOnBorder(image,componentTree, priority);
     }
 }
 
@@ -309,7 +317,8 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
 
 void processWDestructibleElement(Image& image, ComponentTree& componentTree,
                                  WDestructibleElement& element,
-                                 WDestructibleElementsCollection& wDestructibleElements)
+                                 WDestructibleElementsCollection& wDestructibleElements,
+                                 const vector<int>& priority)
 {
     image.setPixelValue(element.pixelPosition,element.futureNode->getLevel() - 1);
     componentTree.getComponentMapping().at(element.pixelPosition) = element.futureNode;
@@ -326,11 +335,12 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
             }
             else
             {
-                wDestructibleElements.addElement(WDestructibleElement(neighbor,
-                                                                      image.at(neighbor),
-                                                                      lc.at(neighbor),
-                                                                      node,
-                                                                      type == FUTURE_MINIMUM));
+                wDestructibleElements.addElement(
+                            WDestructibleElement(neighbor,
+                                                 image.at(neighbor),
+                                                 priority.at(neighbor),
+                                                 node,
+                                                 type == FUTURE_MINIMUM));
             }
         }
     }
@@ -338,17 +348,18 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
 
 WDestructibleElementsCollection initializeSet(Image& image,
                                         ComponentTree& componentTree,
-                                        const Tile& tile)
+                                        const set<unsigned int>& pixelsToProcess,
+                                        const vector<int>& priority)
 {
-    WDestructibleElementsCollection elements(image.getSize());
-    for (auto point : tile)
+    WDestructibleElementsCollection elements;
+    for (auto point : pixelsToProcess)
     {
         PIXEL_TYPE type = MINIMUM;
         Node* node = wDestructible(image,componentTree,point,type);
         if (node)
         {
             elements.addElement(WDestructibleElement(point,image.at(point),
-                                                     lc.at(point),node,
+                                                     priority.at(point),node,
                                                      type == FUTURE_MINIMUM));
         }
     }
@@ -359,16 +370,33 @@ WDestructibleElementsCollection initializeSet(Image& image,
 void doTopologicalWatershedOnTile(Image& image,
                                   ComponentTree& componentTree,
                                   const Tile& tile,
-                                  const Tile pixelsToProcess)
+                                  const set<unsigned int> pixelsToProcess,
+                                  const vector<int>& priority)
 {
-    WDestructibleElementsCollection elements = initializeSet(image,componentTree,pixelsToProcess);
+    WDestructibleElementsCollection elements = initializeSet(
+                image,componentTree,pixelsToProcess,priority);
     while(!elements.isEmpty())
     {
         WDestructibleElement element = elements.getMinimum();
         set<unsigned int> neighbors = image.getNeighbors(element.pixelPosition);
-        if (includes(tile.begin(),tile.end(),neighbors.begin(),neighbors.end()))
+
+        unsigned int raw = 0, col = 0;
+        bool isBorder = false;
+        for(auto& n : neighbors)
         {
-            processWDestructibleElement(image,componentTree,element,elements);
+            image.getCoordinates(n,raw,col);
+
+            if(tile.begin.first > raw || raw > tile.end.first ||
+               tile.begin.second > col || col > tile.end.second)
+            {
+                isBorder = true;
+                break;
+            }
+        }
+        image.getCoordinates(element.pixelPosition,raw,col);
+        if (!isBorder)
+        {
+            processWDestructibleElement(image,componentTree,element,elements,priority);
         }
         else
         {
@@ -378,10 +406,12 @@ void doTopologicalWatershedOnTile(Image& image,
 }
 
 void doTopologicalWatershedOnBorder(Image& image,
-                                    ComponentTree& componentTree)
+                                    ComponentTree& componentTree,
+                                    const vector<int>& priority)
 {
     WDestructibleElementsCollection elements = initializeSet(image,componentTree,
-                                                       pendingBorderPoints);
+                                                             pendingBorderPoints,
+                                                             priority);
     while(!elements.isEmpty())
     {
         WDestructibleElement element = elements.getMinimum();
@@ -403,9 +433,10 @@ void doTopologicalWatershedOnBorder(Image& image,
                 {
                     if(elements.isPresent(neighbor))
                     {
-                        elements.addElement(WDestructibleElement(neighbor,image.at(neighbor),
-                                                                 lc.at(neighbor),node,
-                                                                 type == FUTURE_MINIMUM));
+                        elements.addElement(
+                                    WDestructibleElement(neighbor,image.at(neighbor),
+                                                         priority.at(neighbor),node,
+                                                         type == FUTURE_MINIMUM));
                     }
                     else
                     {
@@ -416,7 +447,6 @@ void doTopologicalWatershedOnBorder(Image& image,
         }
     }
 }
-
 
 
 /**************************** NAIVE IMPLEMENTATION **************************/

@@ -56,32 +56,52 @@ vector<Tile> divideSquareIntoTiles(unsigned int squareWidth,
         totalHeightPartitions = maxDivisor;
     }
 
-    unsigned int currentTile = 0;
-    unsigned int counter = 1;
-    for(unsigned int h = 0; h < squareHeight; h++)
+    unsigned int i = 0;
+    unsigned int th = 0;
+    for(unsigned int h = 0; h < squareHeight;)
     {
-        for(unsigned int w = 0; w < squareWidth; w++)
+        unsigned int tw = 0;
+        th++;
+        for(unsigned int w = 0; w < squareWidth;)
         {
-            unsigned int position = w + squareWidth * h;
-            if(position % squareWidth == 0)
+            tw++;
+            tiles.at(i).begin.first = h;
+            tiles.at(i).begin.second = w;
+            tiles.at(i).end.first = min(h + partitionHeight - 1,squareHeight - 1);
+            tiles.at(i).end.second = min(w + partitionWidth - 1,squareWidth - 1);
+
+            if(tw == totalWidthPartitions)
             {
-                counter = 1;
-                currentTile = min((h / partitionHeight) * totalWidthPartitions,
-                                  (totalHeightPartitions - 1) * totalWidthPartitions);
+                tiles.at(i).end.second = squareWidth - 1;
+                w = squareWidth;
             }
-            else if(counter == partitionWidth)
+
+            if(th == totalHeightPartitions)
             {
-                if((currentTile + 1) % totalWidthPartitions != 0)
-                {
-                    counter = 1;
-                    currentTile++;
-                }
+                tiles.at(i).end.first = squareHeight - 1;
             }
-            else
+
+            w += partitionWidth;
+            i++;
+        }
+        h += partitionHeight;
+        if(th == totalHeightPartitions)
+        {
+            h = squareHeight;
+        }
+    }
+
+    // calculate points
+    set<unsigned int> points;
+
+    for(auto& t : tiles)
+    {
+        for(unsigned int raw = t.begin.first; raw <= t.end.first; raw++)
+        {
+            for(unsigned int col = t.begin.second; col <= t.end.second; col++)
             {
-                counter++;
+                t.points.insert(raw * squareWidth + col);
             }
-            tiles.at(currentTile).insert(position);
         }
     }
 

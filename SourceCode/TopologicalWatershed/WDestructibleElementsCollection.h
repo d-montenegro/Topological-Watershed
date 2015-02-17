@@ -8,7 +8,7 @@
 class WDestructibleElementsCollection
 {
 public:
-    WDestructibleElementsCollection(unsigned int maxSize) : collection(),
+    WDestructibleElementsCollection() : collection(),
         mapping() {}
     ~WDestructibleElementsCollection() {}
 

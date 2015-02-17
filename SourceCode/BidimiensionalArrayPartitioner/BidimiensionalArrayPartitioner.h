@@ -1,10 +1,27 @@
 #ifndef __BIDIMENSIONALARRAYPARTITIONER_H_INCLUDED__
 #define __BIDIMENSIONALARRAYPARTITIONER_H_INCLUDED__
 
-#include <set>
+#include <utility>
 #include <vector>
+#include <set>
 
-using Tile = std::set<unsigned int>;
+/*
+ * Tile contains the coordinates for a square
+ */
+struct Tile {
+    std::pair<unsigned int,unsigned int> begin;
+    std::pair<unsigned int,unsigned int> end;
+    std::set<unsigned int> points;
+
+    Tile(unsigned int x = 0, unsigned int y = 0, unsigned int k = 0,
+         unsigned int z = 0, std::set<unsigned int> points = { }) : begin(x,y),
+         end(k,z), points(points) { }
+
+    bool operator== (const Tile& t) const
+    {
+        return begin == t.begin && end == t.end && points == t.points;
+    }
+};
 
 /*
  * Returns optimal partition of a width x heigh square in n, where each partition

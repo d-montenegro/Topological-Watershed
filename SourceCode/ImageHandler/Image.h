@@ -93,6 +93,8 @@ public:
     ushort getHighestGreyIntensity() const { return highestGreyIntensity; }
     unsigned int getSize() const { return pixels.size(); }
     ushort at(unsigned int position) const { return pixels.at(position); }
+    void getCoordinates(unsigned int position, unsigned int& raw,
+                        unsigned int& col) const;
     void setPixelValue(unsigned int pixelPosition, ushort newGreyValue)
     {
         pixels.at(pixelPosition) = newGreyValue;
@@ -113,6 +115,18 @@ inline void Image::decrementPixel(unsigned int pixelPosition)
         throw invalid_argument("already a minimum");
     }
     pixels.at(pixelPosition) = pixels.at(pixelPosition) - 1;
+}
+
+inline void Image::getCoordinates(unsigned int position, unsigned int& raw,
+                           unsigned int& col) const
+{
+    if(position >= pixels.size())
+    {
+        throw invalid_argument("Invalid position");
+    }
+
+    raw = position / width;
+    col = position % width;
 }
 
 #endif // __IMAGE_H_INCLUDED__

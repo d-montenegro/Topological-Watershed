@@ -5,6 +5,52 @@
 
 #include "ImageFourNeighborType.h"
 
+TEST(ImageTest, checkCoordinates) {
+
+    vector<unsigned short> dummyPixelArray = { 0,0,0,
+                                               0,0,0,
+                                               0,0,0 };
+    ImageFourNeighborType image(dummyPixelArray,3,3);
+
+    unsigned int raw = 0, col = 0;
+
+    image.getCoordinates(0,raw,col);
+    ASSERT_EQ(0,raw);
+    ASSERT_EQ(0,col);
+
+    image.getCoordinates(1,raw,col);
+    ASSERT_EQ(0,raw);
+    ASSERT_EQ(1,col);
+
+    image.getCoordinates(2,raw,col);
+    ASSERT_EQ(0,raw);
+    ASSERT_EQ(2,col);
+
+    image.getCoordinates(3,raw,col);
+    ASSERT_EQ(1,raw);
+    ASSERT_EQ(0,col);
+
+    image.getCoordinates(4,raw,col);
+    ASSERT_EQ(1,raw);
+    ASSERT_EQ(1,col);
+
+    image.getCoordinates(5,raw,col);
+    ASSERT_EQ(1,raw);
+    ASSERT_EQ(2,col);
+
+    image.getCoordinates(6,raw,col);
+    ASSERT_EQ(2,raw);
+    ASSERT_EQ(0,col);
+
+    image.getCoordinates(7,raw,col);
+    ASSERT_EQ(2,raw);
+    ASSERT_EQ(1,col);
+
+    image.getCoordinates(8,raw,col);
+    ASSERT_EQ(2,raw);
+    ASSERT_EQ(2,col);
+
+}
 
 TEST(ImageTest, checkNeighbors) {
     vector<unsigned short> dummyPixelArray = { 0,0,0,0,0,0,0,0,0 };
