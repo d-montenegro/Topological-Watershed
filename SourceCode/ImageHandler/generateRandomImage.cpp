@@ -35,10 +35,9 @@ void parseImageSize(string imageSize, ushort& width, ushort& height)
 void printUsage(string binaryName)
 {
     cout << "Usage is " << binaryName <<
-            " -s <image_size> -f <format> -out <dest_image_path> " << endl << endl
+            " -s <image_size> -out <dest_image_path> " << endl << endl
          << "image_size is the size of the random image in format <width>x<height>" << endl
-         << "format is the format of the source image, may be JPG, JPEG or PNG" << endl
-         << "dest_image_path is the path where the image will be wrote" << endl << endl;
+         << "dest_image_path is the path where the image will be wrote. Will be PNG format" << endl << endl;
 }
 
 int main(int argc, char* argv[])
@@ -51,7 +50,6 @@ int main(int argc, char* argv[])
     }
 
     string destinationImage;
-    IMAGE_FORMAT format;
     ushort width = 0, height = 0;
     for (int i = 1; i < argc; i++)
     {
@@ -64,27 +62,6 @@ int main(int argc, char* argv[])
             catch(...)
             {
                 cout << "Wrong size: " << argv[i+1] << endl;
-                printUsage(argv[0]);
-                return 0;
-            }
-        }
-        else if (strcmp(argv[i],"-f") == 0)
-        {
-            if(strcmp(argv[i+1],"JPG") == 0)
-            {
-                format = JPG;
-            }
-            else if(strcmp(argv[i+1],"JPEG") == 0)
-            {
-                format = JPEG;
-            }
-            else if(strcmp(argv[i+1],"PNG") == 0)
-            {
-                format = PNG;
-            }
-            else
-            {
-                cout << "Uknown image format: " << argv[i+1] << endl;
                 printUsage(argv[0]);
                 return 0;
             }
@@ -112,7 +89,7 @@ int main(int argc, char* argv[])
         pixels.push_back(distribution(generator));
     }
 
-    writeImage(destinationImage,format,pixels,width,height);
+    writeImage(destinationImage,PNG,pixels,width,height);
 
     return 0;
 }

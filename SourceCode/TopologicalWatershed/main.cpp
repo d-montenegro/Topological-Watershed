@@ -14,29 +14,35 @@ using namespace std;
 
 enum RELATION_TYPE
 {
-    TYPE_4 = 0,
+    UNKNOWN = 0,
+    TYPE_4,
     TYPE_8
 };
 
 void printUsage(string binaryName)
 {
     cout << "Usage is " << binaryName <<
-            " -in <source_image_path> -out <dest_image_path> -r <neighbor_relation>\
- [-t <thread_number>]" << endl  << endl
-         << "source_image_path is the path to a greyscale. Must be PNG format" << endl
-         << "dest_image_path is the path where the processed image will be wrote" << endl
-         << "neigbor_relation may be 4 for 4-neighbor relation type, or 8 "
-         << "for 8-neighbor relation type" << endl
-         << "thread_number specifies the number of threads to use. Will be 1 if not specified" << endl << endl;
+            " -in <input> -out <output> -r <neighbor_relation> [-t <thread_number>]." << endl  << endl
+         << "\tinput \tinput PNG greyscale image." << endl
+         << "\toutput \toutput PNG greyscale image." << endl
+         << "\tneigbor_relation \t4 to 4-neighbor relation type, or 8 to 8-neighbor relation type." << endl
+         << "\tthread_number \t the number of threads to use. 1 by default." << endl << endl
+         << "Example: " << binaryName << " -in source.png -out destination.png -r 4 -t 8" << endl << endl;
 }
 
 int main(int argc, char* argv[])
 {
+    if (argc == 1)
+    {
+        printUsage(argv[0]);
+        return 0;
+    }
+
     if (argc != 7 && argc != 9)
     {
         cout << "Wrong params." << endl;
         printUsage(argv[0]);
-        return 0;
+        return 1;
     }
 
     string sourceImage, destinationImage;
@@ -67,7 +73,7 @@ int main(int argc, char* argv[])
             {
                 cout << "Uknown neighbor relation type: " << argv[i+1] << endl;
                 printUsage(argv[0]);
-                return 0;
+                return 1;
             }
         }
         else if(strcmp(argv[i],"-t") == 0)
@@ -77,7 +83,7 @@ int main(int argc, char* argv[])
             {
                 cout << "Threads number must be equal or higher than 1" << endl;
                 printUsage(argv[0]);
-                return 0;
+                return 1;
             }
             threads = threadsToUse;
         }
@@ -85,9 +91,30 @@ int main(int argc, char* argv[])
         {
             cout << "Unknown param: " << argv[i] << "." << endl;
             printUsage(argv[0]);
-            return 0;
+            return 1;
         }
         i++;
+    }
+
+    if(sourceImage.empty())
+    {
+        cout << "missing source image" << endl;
+        printUsage(argv[0]);
+        return 1;
+    }
+
+    if(destinationImage.empty())
+    {
+        cout << "missing destination image" << endl;
+        printUsage(argv[0]);
+        return 1;
+    }
+
+    if(relationType == UNKNOWN)
+    {
+        cout << "missing neighbor relation type" << endl;
+        printUsage(argv[0]);
+        return 1;
     }
 
     vector<ushort> pixels;
@@ -139,12 +166,13 @@ int main(int argc, char* argv[])
     }
     catch (const bad_alloc&)
     {
-        cerr << "Not enough memory to continue."
-             << endl;
+        cout << "Not enough memory to continue." << endl;
+        return 1;
     }
     catch (const exception& e)
     {
-        cerr << "An unexpected error occurs. Detail: " << e.what() << endl;
+        cout << "Unexpected error occurs. Detail: " << e.what() << endl;
+        return 1;
     }
 
     return 0;

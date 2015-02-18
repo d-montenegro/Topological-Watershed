@@ -57,7 +57,6 @@ ComponentTree::~ComponentTree()
     deleteTree(root);
 }
 
-// TODO: split this method in several ones
 void ComponentTree::buildComponentTree(const Image& image)
 {
     unsigned int totalPixels = image.getSize();

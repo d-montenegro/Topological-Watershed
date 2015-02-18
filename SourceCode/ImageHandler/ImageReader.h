@@ -6,10 +6,7 @@
 
 enum IMAGE_FORMAT
 {
-    JPG = 0,
-    JPEG,
-    PNG,
-    PGM
+    PNG = 0
 };
 
 void readImage(const std::string& imagePath, IMAGE_FORMAT format,
