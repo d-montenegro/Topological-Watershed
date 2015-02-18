@@ -1,2 +1,2 @@
 add_library(ComponentTree ComponentTree.cpp LCASolver.cpp)
-target_link_libraries(ComponentTree DisjointSetCollection ImageFourNeighborType)
+target_link_libraries(ComponentTree DisjointSetCollection ImageNeighborRelation)

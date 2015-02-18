@@ -1,4 +1,4 @@
-add_library(ImageFourNeighborType ImageFourNeighborType.cpp)
+add_library(ImageNeighborRelation ImageFourNeighborType.cpp ImageEightNeighborType.cpp)
 add_library(ImageReader ImageReader.cpp)
 target_link_libraries(ImageReader jpeg png)
 

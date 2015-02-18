@@ -93,8 +93,13 @@ public:
     ushort getHighestGreyIntensity() const { return highestGreyIntensity; }
     unsigned int getSize() const { return pixels.size(); }
     ushort at(unsigned int position) const { return pixels.at(position); }
+    ushort at(unsigned int raw, unsigned int col) const
+        { return pixels.at(getAbsolute(raw,col)); }
     void getCoordinates(unsigned int position, unsigned int& raw,
                         unsigned int& col) const;
+    unsigned int getAbsolute(unsigned int raw, unsigned int col) const
+        { return raw * width + col; }
+
     void setPixelValue(unsigned int pixelPosition, ushort newGreyValue)
     {
         pixels.at(pixelPosition) = newGreyValue;

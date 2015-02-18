@@ -34,10 +34,12 @@ public:
 
     unsigned int getTotalNodes() const { return totalNodes; }
     Node* getRoot() const { return root; }
-    ComponentMapping& getComponentMapping() { return componentMapping; }
+    ComponentMapping getComponentMapping() const { return componentMapping; }
     bool isLeaf(Node *node) const { return node->getChilds().empty(); }
     Node* getComponent(unsigned int pixelPosition) const
     { return componentMapping.at(pixelPosition); }
+    void setComponent(unsigned int pixelPosition, Node* node)
+    { componentMapping.at(pixelPosition) = node; }
 
 private:
     void buildComponentTree(const Image& image);

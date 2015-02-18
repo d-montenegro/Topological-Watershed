@@ -38,13 +38,13 @@ TEST(ComponentTreeTest, checkComponentTree_0) {
 
     ASSERT_EQ(7,tree.getTotalNodes());
 
-    Node *c1 = tree.getComponentMapping().at(9);
-    Node *c2 = tree.getComponentMapping().at(5);
-    Node *c3 = tree.getComponentMapping().at(0);
-    Node *c5 = tree.getComponentMapping().at(33);
-    Node *c6 = tree.getComponentMapping().at(29);
-    Node *c7 = tree.getComponentMapping().at(13);
-    Node *c9 = tree.getComponentMapping().at(4);
+    Node *c1 = tree.getComponent(9);
+    Node *c2 = tree.getComponent(5);
+    Node *c3 = tree.getComponent(0);
+    Node *c5 = tree.getComponent(33);
+    Node *c6 = tree.getComponent(29);
+    Node *c7 = tree.getComponent(13);
+    Node *c9 = tree.getComponent(4);
 
     ASSERT_EQ(vector<ushort>({ 9,10,11,18,19,27,36,37,39,45,46,47,48 }),
         getComponent(tree.getComponentMapping(),c1));
@@ -152,19 +152,19 @@ TEST(ComponentTreeTest, checkComponentTree_1) {
 
     ASSERT_EQ(13, tree.getTotalNodes());
 
-    Node* a = tree.getComponentMapping().at(0);
-    Node* b = tree.getComponentMapping().at(2);
-    Node* c = tree.getComponentMapping().at(54);
-    Node* d = tree.getComponentMapping().at(28);
-    Node* e = tree.getComponentMapping().at(7);
-    Node* f = tree.getComponentMapping().at(11);
-    Node* g = tree.getComponentMapping().at(16);
-    Node* h = tree.getComponentMapping().at(10);
-    Node* i = tree.getComponentMapping().at(15);
-    Node* j = tree.getComponentMapping().at(42);
-    Node* k = tree.getComponentMapping().at(22);
-    Node* l = tree.getComponentMapping().at(5);
-    Node* m = tree.getComponentMapping().at(1);
+    Node* a = tree.getComponent(0);
+    Node* b = tree.getComponent(2);
+    Node* c = tree.getComponent(54);
+    Node* d = tree.getComponent(28);
+    Node* e = tree.getComponent(7);
+    Node* f = tree.getComponent(11);
+    Node* g = tree.getComponent(16);
+    Node* h = tree.getComponent(10);
+    Node* i = tree.getComponent(15);
+    Node* j = tree.getComponent(42);
+    Node* k = tree.getComponent(22);
+    Node* l = tree.getComponent(5);
+    Node* m = tree.getComponent(1);
 
     // Check component mapping
     ASSERT_EQ(vector<ushort>({ 0,13,26,39,52,65 }),
@@ -328,14 +328,14 @@ TEST(ComponentTreeTest, checkComponentTree_2) {
 
     ASSERT_EQ(8,tree.getTotalNodes());
 
-    Node *z = tree.getComponentMapping().at(0);
-    Node *i = tree.getComponentMapping().at(6);
-    Node *g = tree.getComponentMapping().at(7);
-    Node *e = tree.getComponentMapping().at(8);
-    Node *d = tree.getComponentMapping().at(9);
-    Node *c = tree.getComponentMapping().at(12);
-    Node *b = tree.getComponentMapping().at(13);
-    Node *a = tree.getComponentMapping().at(21);
+    Node *z = tree.getComponent(0);
+    Node *i = tree.getComponent(6);
+    Node *g = tree.getComponent(7);
+    Node *e = tree.getComponent(8);
+    Node *d = tree.getComponent(9);
+    Node *c = tree.getComponent(12);
+    Node *b = tree.getComponent(13);
+    Node *a = tree.getComponent(21);
 
     ASSERT_EQ(vector<ushort>({ 0,1,2,3,4,5,10,15,20 }),
         getComponent(tree.getComponentMapping(),z));

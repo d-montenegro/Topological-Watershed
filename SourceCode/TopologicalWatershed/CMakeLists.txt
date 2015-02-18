@@ -1,5 +1,5 @@
 add_library(TopologicalWatershed TopologicalWatershed.cpp WDestructibleElementsCollection.cpp)
-target_link_libraries(TopologicalWatershed ImageFourNeighborType ComponentTree
+target_link_libraries(TopologicalWatershed ImageNeighborRelation ComponentTree
 ImageReader BidimiensionalArrayPartitioner)
 
 add_executable(doNaiveTopologicalWatershed doNaiveTopologicalWatershed.cpp)
@@ -10,3 +10,6 @@ target_link_libraries(doLinearTopologicalWatershed TopologicalWatershed)
 
 add_executable(doParallelTopologicalWatershed doParallelTopologicalWatershed.cpp)
 target_link_libraries(doParallelTopologicalWatershed TopologicalWatershed)
+
+add_executable(topologicalWatershed main.cpp)
+target_link_libraries(topologicalWatershed TopologicalWatershed)

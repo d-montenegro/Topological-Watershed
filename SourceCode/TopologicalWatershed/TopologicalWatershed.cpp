@@ -258,7 +258,7 @@ Node* wDestructible(const Image& image, ComponentTree& componentTree,
 
     for (auto& neighbor : neighbors)
     {
-        nodesFromNeighbor.insert(componentTree.getComponentMapping().at(neighbor));
+        nodesFromNeighbor.insert(componentTree.getComponent(neighbor));
     }
 
     if (nodesFromNeighbor.empty())
@@ -321,7 +321,7 @@ void processWDestructibleElement(Image& image, ComponentTree& componentTree,
                                  const vector<int>& priority)
 {
     image.setPixelValue(element.pixelPosition,element.futureNode->getLevel() - 1);
-    componentTree.getComponentMapping().at(element.pixelPosition) = element.futureNode;
+    componentTree.setComponent(element.pixelPosition,element.futureNode);
 
     for (auto& neighbor : image.getNeighbors(element.pixelPosition))
     {
@@ -416,7 +416,7 @@ void doTopologicalWatershedOnBorder(Image& image,
     {
         WDestructibleElement element = elements.getMinimum();
         image.setPixelValue(element.pixelPosition,element.futureNode->getLevel() - 1);
-        componentTree.getComponentMapping().at(element.pixelPosition) = element.futureNode;
+        componentTree.setComponent(element.pixelPosition,element.futureNode);
 
         for (auto& neighbor : image.getNeighbors(element.pixelPosition))
         {

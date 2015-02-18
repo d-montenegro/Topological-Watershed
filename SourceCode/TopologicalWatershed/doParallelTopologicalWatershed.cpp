@@ -7,6 +7,7 @@
 #include "TopologicalWatershed.h"
 #include "ImageReader.h"
 #include "ImageFourNeighborType.h"
+#include "ImageEightNeighborType.h"
 
 using namespace std;
 
@@ -121,9 +122,13 @@ int main(int argc, char* argv[])
     {
         image = new ImageFourNeighborType(pixels,width,height);
     }
+    else if(relationType == TYPE_8)
+    {
+        image = new ImageEightNeighborType(pixels,width,height);
+    }
     else
     {
-        throw invalid_argument("8_TYPE neighbor relation unimplemented yet.");
+        throw invalid_argument("Invalid neighbor relation type");
     }
 
     time_t start,end;
