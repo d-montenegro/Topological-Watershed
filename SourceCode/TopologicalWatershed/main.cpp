@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <ctime>
+#include <exception>
 
 #include "TopologicalWatershed.h"
 #include "ImageReader.h"
@@ -92,46 +93,60 @@ int main(int argc, char* argv[])
     vector<ushort> pixels;
     unsigned int width = 0;
     unsigned int height = 0;
-    IMAGE_FORMAT format = PNG;
 
-    readImage(sourceImage,format,pixels,width,height);
-
-    Image* image = 0;
-    if(relationType == TYPE_4)
+    try
     {
-        image = new ImageFourNeighborType(pixels,width,height);
+        readImage(sourceImage,PNG,pixels,width,height);
+
+        Image* image = 0;
+        if(relationType == TYPE_4)
+        {
+            image = new ImageFourNeighborType(pixels,width,height);
+        }
+        else if(relationType == TYPE_8)
+        {
+            image = new ImageEightNeighborType(pixels,width,height);
+        }
+        else
+        {
+            throw invalid_argument("Invalid neighbor relation type");
+        }
+
+        time_t start,end;
+        time (&start);
+
+        ComponentTree tree(*image);
+        time(&end);
+        cout << "Component Tree done - " << (double)difftime(end,start) << " sec" << endl;
+
+        if(threads == 1)
+        {
+            doLinearTopologicalWatershed(*image,tree);
+        }
+        else
+        {
+            doParallelTopologicalWatershed(*image, tree, threads);
+        }
+        time(&end);
+        cout << "Topological Watershed performed - " <<
+                (double)difftime(end,start) << " sec" << endl;
+
+        writeImage(destinationImage,PNG,image->getPixels(),
+                   image->getWidth(),image->getHeight());
+
+        delete image;
+        image = 0;
     }
-    else if(relationType == TYPE_8)
+    catch (const bad_alloc&)
     {
-        image = new ImageEightNeighborType(pixels,width,height);
+        cerr << "Not enough memory to continue."
+             << endl;
     }
-    else
+    catch (const exception& e)
     {
-        throw invalid_argument("Invalid neighbor relation type");
+        cerr << "An unexpected error occurs. Detail: " << e.what() << endl;
     }
 
-    time_t start,end;
-    time (&start);
-    ComponentTree tree(*image);
-    time(&end);
-    cout << "Component Tree done - " << (double)difftime(end,start) << " sec" << endl;
-
-    if(threads == 1)
-    {
-        doLinearTopologicalWatershed(*image,tree);
-    }
-    else
-    {
-        doParallelTopologicalWatershed(*image, tree, threads);
-    }
-    time(&end);
-    cout << "Topological Watershed performed - " <<
-            (double)difftime(end,start) << " sec" << endl;
-
-    writeImage(destinationImage,format,image->getPixels(),
-               image->getWidth(),image->getHeight());
-
-    delete image;
     return 0;
 }
 
