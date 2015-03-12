@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstring>
-#include <ctime>
 
 #include "TopologicalWatershed.h"
 #include "ImageReader.h"
@@ -124,12 +123,7 @@ int main(int argc, char* argv[])
             throw invalid_argument("Invalid neighbor relation type");
         }
 
-        time_t start,end;
-        time(&start);
         doNaiveTopologicalWatershed(*image);
-        time(&end);
-        cout << "Naive Topological Watershed performed - " <<
-                (double)difftime(end,start) << " sec" << endl;
 
         writeImage(destinationImage,PNG,image->getPixels(),
                    image->getWidth(),image->getHeight());

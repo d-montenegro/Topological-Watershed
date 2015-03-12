@@ -1,6 +1,6 @@
 add_library(ImageNeighborRelation ImageFourNeighborType.cpp ImageEightNeighborType.cpp)
 add_library(ImageReader ImageReader.cpp)
-target_link_libraries(ImageReader jpeg png)
+target_link_libraries(ImageReader png)
 
 add_executable(generateRandomImage generateRandomImage.cpp)
 target_link_libraries(generateRandomImage ImageReader)
