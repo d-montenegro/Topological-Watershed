@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <cstring>
 #include <cstdlib>
-#include <ctime>
+#include <sys/time.h>
 #include <exception>
 
 #include "TopologicalWatershed.h"
@@ -139,13 +139,10 @@ int main(int argc, char* argv[])
             throw invalid_argument("Invalid neighbor relation type");
         }
 
-        time_t start,end;
-        time (&start);
-
         ComponentTree tree(*image);
-        time(&end);
-        cout << "Component Tree done - " << (double)difftime(end,start) << " sec" << endl;
 
+        static struct timeval tm1;
+        gettimeofday(&tm1, NULL);
         if(threads == 1)
         {
             doLinearTopologicalWatershed(*image,tree);
@@ -154,9 +151,12 @@ int main(int argc, char* argv[])
         {
             doParallelTopologicalWatershed(*image, tree, threads);
         }
-        time(&end);
+
+        struct timeval tm2;
+        gettimeofday(&tm2, NULL);
+        double t = (tm2.tv_sec - tm1.tv_sec) + (tm2.tv_usec - tm1.tv_usec) / 1000000.;
         cout << "Topological Watershed performed - " <<
-                (double)difftime(end,start) << " sec" << endl;
+                t   << " sec" << endl;
 
         writeImage(destinationImage,PNG,image->getPixels(),
                    image->getWidth(),image->getHeight());
