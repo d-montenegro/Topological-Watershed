@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstddef>
-#include <jpeglib.h>
 #include <ImageReader.h>
 #include <stdexcept>
 #include <cstring>

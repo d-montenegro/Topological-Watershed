@@ -8,8 +8,8 @@ from time import sleep, time
 
 
 MEASURE_TIME_INTERVAL = 0.1 # in seconds
-TOPOLOGICAL_WATERSHED_PATH = '/home/damian/TopologicalWatershed/SourceCode/bin/TopologicalWatershed/topologicalWatershed'
-SOURCE_DIRECTORY = '/home/damian/TopologicalWatershed/imagenesAleatorias'
+TOPOLOGICAL_WATERSHED_PATH = '/home/damian/Topological-Watershed/SourceCode/bin/TopologicalWatershed/topologicalWatershed'
+SOURCE_DIRECTORY = '/home/damian/Topological-Watershed/imagenesAleatorias'
 IMAGES_TO_PROCESS = ['random500x500.png','random1000x1000.png','random1500x1500.png',
 'random2000x2000.png','random2500x2500.png','random3000x3000.png','random3500x3500.png']
 OUTPUT_DIRECTORY = SOURCE_DIRECTORY + '/resultados-{}'.format(datetime.now().isoformat())
@@ -18,6 +18,8 @@ OUTPUT_DIRECTORY = SOURCE_DIRECTORY + '/resultados-{}'.format(datetime.now().iso
 MEASUREMENT_DETAILS = OrderedDict()
 MEASUREMENT_DETAILS['secuencial_r4'] = (4,1)
 MEASUREMENT_DETAILS['secuencial_r8'] = (8,1)
+MEASUREMENT_DETAILS['2-threads_r4'] = (4,2)
+MEASUREMENT_DETAILS['2-threads_r8'] = (8,2)
 MEASUREMENT_DETAILS['4-threads_r4'] = (4,4)
 MEASUREMENT_DETAILS['4-threads_r8'] = (8,4)
 MEASUREMENT_DETAILS['8-threads_r4'] = (4,8)
@@ -92,7 +94,11 @@ def run_measurement():
             output_file_name = image_file_name_without_extension + '_{}.png'.format(medition_name)
             
             #do measure
-            result = measure(SOURCE_DIRECTORY + '/' + image_file_name, OUTPUT_DIRECTORY + '/' + output_file_name, neighbor_rel, threads)
+            result = measure(path.join(SOURCE_DIRECTORY, image_file_name), 
+                             path.join(OUTPUT_DIRECTORY, output_file_name),
+                             neighbor_rel,
+                             threads)            
+  
             print output_file_name + ' - ' + str(result)
     
     end = time()

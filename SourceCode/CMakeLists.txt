@@ -5,6 +5,8 @@ project(TopologicalWatershed)
 set(TopologicalWatershed_VERSION_MAJOR 1)
 set(TopologicalWatershed_VERSION_MINOR 0)
 
+find_library(png++ REQUIRED)
+
 # Options. Turn ON to build tests.
 option(UNITTEST "Tests." ON)
 
