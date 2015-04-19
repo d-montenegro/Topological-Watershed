@@ -16,8 +16,10 @@ OUTPUT_DIRECTORY = SOURCE_DIRECTORY + '/resultados-{}'.format(datetime.now().iso
 
 # measurement details : measure_name -> (neighbor_relation,number_of_threads)
 MEASUREMENT_DETAILS = OrderedDict()
-MEASUREMENT_DETAILS['secuencial_r4'] = (4,1)
-MEASUREMENT_DETAILS['secuencial_r8'] = (8,1)
+MEASUREMENT_DETAILS['secuencial_r4'] = (4,0)
+MEASUREMENT_DETAILS['secuencial_r8'] = (8,0)
+MEASUREMENT_DETAILS['1-threads_r4'] = (4,1)
+MEASUREMENT_DETAILS['1-threads_r8'] = (8,1)
 MEASUREMENT_DETAILS['2-threads_r4'] = (4,2)
 MEASUREMENT_DETAILS['2-threads_r8'] = (8,2)
 MEASUREMENT_DETAILS['4-threads_r4'] = (4,4)
@@ -33,7 +35,7 @@ def getMean(aNumList):
     return reduce(lambda x, y: x + y, aNumList) / len(aNumList)
 
 
-def measure(sourceImagePath,outputImagePath,neighborRelation,numberOfThreads = 1):
+def measure(sourceImagePath,outputImagePath,neighborRelation,numberOfThreads = 0):
     """ Run topological watershed.
         PARAMS:
             sourceImagePath: input image file path
@@ -54,8 +56,13 @@ def measure(sourceImagePath,outputImagePath,neighborRelation,numberOfThreads = 1
     start = time()
     
     #start topological watershed process
-    topwatProcess = Popen([TOPOLOGICAL_WATERSHED_PATH,'-in',sourceImagePath,'-out',
-        outputImagePath,'-r',str(neighborRelation),'-t',str(numberOfThreads)],stdout=PIPE)
+    if numberOfThreads == 0:
+        topwatProcess = Popen([TOPOLOGICAL_WATERSHED_PATH,'-in', sourceImagePath, '-out',
+                              outputImagePath, '-r', str(neighborRelation)], stdout=PIPE)
+    else:
+        topwatProcess = Popen([TOPOLOGICAL_WATERSHED_PATH,'-in', sourceImagePath, '-out',
+                              outputImagePath, '-r', str(neighborRelation), '-t', 
+                              str(numberOfThreads)], stdout=PIPE)
     
     #topological watershed process snapshot
     topwatPS = Process(topwatProcess.pid)

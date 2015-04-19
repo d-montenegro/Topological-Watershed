@@ -195,7 +195,7 @@ void doLinearTopologicalWatershed(Image& image, ComponentTree& componentTree)
 void doParallelTopologicalWatershed(Image& image, ComponentTree& componentTree,
                                     ushort numberOfThreads)
 {
-    if(numberOfThreads < 2)
+    if(numberOfThreads < 1)
     {
         throw invalid_argument("Invalid number of threads");
     }

@@ -26,7 +26,7 @@ void printUsage(string binaryName)
          << "\tinput \tinput PNG greyscale image." << endl
          << "\toutput \toutput PNG greyscale image." << endl
          << "\tneigbor_relation \t4 to 4-neighbor relation type, or 8 to 8-neighbor relation type." << endl
-         << "\tthread_number \t the number of threads to use. 1 by default." << endl << endl
+         << "\tthread_number \t the number of threads to use. If not specified, sequential algorithm will run." << endl << endl
          << "Example: " << binaryName << " -in source.png -out destination.png -r 4 -t 8" << endl << endl;
 }
 
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     string sourceImage, destinationImage;
     RELATION_TYPE relationType;
 
-    unsigned short threads = 1;
+    unsigned short threads = 0;
     for (int i = 1; i < argc; i++)
     {
         if (strcmp(argv[i],"-in") == 0)
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 
         static struct timeval tm1;
         gettimeofday(&tm1, NULL);
-        if(threads == 1)
+        if(threads == 0)
         {
             doLinearTopologicalWatershed(*image,tree);
         }
