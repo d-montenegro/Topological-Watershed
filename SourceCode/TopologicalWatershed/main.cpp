@@ -139,9 +139,15 @@ int main(int argc, char* argv[])
             throw invalid_argument("Invalid neighbor relation type");
         }
 
+        struct timeval tm1;
+        gettimeofday(&tm1, NULL);
         ComponentTree tree(*image);
+        struct timeval tm2;
+        gettimeofday(&tm2, NULL);
 
-        static struct timeval tm1;
+        double t = (tm2.tv_sec - tm1.tv_sec) + (tm2.tv_usec - tm1.tv_usec) / 1000000.;
+        cout << "ComponentTree performed" << t << " sec" << endl;
+
         gettimeofday(&tm1, NULL);
         if(threads == 0)
         {
@@ -152,11 +158,9 @@ int main(int argc, char* argv[])
             doParallelTopologicalWatershed(*image, tree, threads);
         }
 
-        struct timeval tm2;
         gettimeofday(&tm2, NULL);
-        double t = (tm2.tv_sec - tm1.tv_sec) + (tm2.tv_usec - tm1.tv_usec) / 1000000.;
-        cout << "Topological Watershed performed - " <<
-                t   << " sec" << endl;
+        t = (tm2.tv_sec - tm1.tv_sec) + (tm2.tv_usec - tm1.tv_usec) / 1000000.;
+        cout << "Topological Watershed performed - " << t << " sec" << endl;
 
         writeImage(destinationImage,PNG,image->getPixels(),
                    image->getWidth(),image->getHeight());
