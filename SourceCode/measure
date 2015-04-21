@@ -5,6 +5,7 @@ from os import path,makedirs
 from psutil import Process
 from subprocess import Popen, PIPE
 from time import sleep, time
+from re import findall
 
 
 MEASURE_TIME_INTERVAL = 0.1 # in seconds
@@ -29,62 +30,77 @@ MEASUREMENT_DETAILS['8-threads_r8'] = (8,8)
 MEASUREMENT_DETAILS['16-threads_r4'] = (4,16)
 MEASUREMENT_DETAILS['16-threads_r8'] = (8,16)
 
+RESULT_FORMAT = 'File {} - Total time {}s ({}% ct - {}% tw) average cpu {}% (max {}) average mem {}MB' 
 
-def getMean(aNumList):
+def get_mean(a_num_list):
     """ calcule mean of a numeric list """
-    return reduce(lambda x, y: x + y, aNumList) / len(aNumList)
+    return reduce(lambda x, y: x + y, a_num_list) / len(a_num_list)
 
 
-def measure(sourceImagePath,outputImagePath,neighborRelation,numberOfThreads = 0):
+def round_one_decimal(float_num):
+    return '%.1f' % round(float_num, 1)
+
+
+def parse_stdout(app_stdout):
+    #ComponentTree performed - 2.09189 sec
+    #Topological Watershed performed - 3.27692 sec
+    (component_tree_data, topological_watershed_data, _) = app_stdout.split('\n')
+    component_tree_time = float(findall("\d+.\d+", component_tree_data)[0])
+    top_wat_time = float(findall("\d+.\d+", topological_watershed_data)[0])
+    return (component_tree_time, top_wat_time)
+
+def measure(source_image_path,output_image_path,neighbor_relation,number_of_threads):
     """ Run topological watershed.
         PARAMS:
-            sourceImagePath: input image file path
-            outputImagePath: output image file path
-            neighborRelation: neighbor relation type
-            numberOfThreads: number of threads to use
+            source_image_path: input image file path
+            output_image_path: output image file path
+            neighbor_relation: neighbor relation type
+            number_of_threads: number of threads to use
         RETURN:
             4-tuple indicaring
-                - RAM memory usage (%)
-                - CPU usage (%)
+                - average RAM memory usage (in B)
+                - average CPU usage (%)
+                - max cpu percent usage
                 - process' stdout
                 - total execution time        
     """
-    memPercent = []
-    cpuPercent = []
+    mem_usage = []
+    cpu_percent = []
     
     #begin time
     start = time()
     
     #start topological watershed process
-    if numberOfThreads == 0:
-        topwatProcess = Popen([TOPOLOGICAL_WATERSHED_PATH,'-in', sourceImagePath, '-out',
-                              outputImagePath, '-r', str(neighborRelation)], stdout=PIPE)
+    if number_of_threads == 0:
+        topwat_process = Popen([TOPOLOGICAL_WATERSHED_PATH,'-in', source_image_path, '-out',
+                              output_image_path, '-r', str(neighbor_relation)], stdout=PIPE)
     else:
-        topwatProcess = Popen([TOPOLOGICAL_WATERSHED_PATH,'-in', sourceImagePath, '-out',
-                              outputImagePath, '-r', str(neighborRelation), '-t', 
-                              str(numberOfThreads)], stdout=PIPE)
+        topwat_process = Popen([TOPOLOGICAL_WATERSHED_PATH,'-in', source_image_path, '-out',
+                              output_image_path, '-r', str(neighbor_relation), '-t', 
+                              str(number_of_threads)], stdout=PIPE)
     
     #topological watershed process snapshot
-    topwatPS = Process(topwatProcess.pid)
+    topwat_ps = Process(topwat_process.pid)
     
     #discard first cpu medition as will always be 0
-    topwatPS.get_cpu_percent()
+    topwat_ps.get_cpu_percent()
 
     # while process is running
-    while topwatProcess.poll() == None:
+    while topwat_process.poll() == None:
         
         #get current cpu percent
-        cpuPercent.append(topwatPS.get_cpu_percent())
+        cpu_percent.append(topwat_ps.get_cpu_percent())
         
         #get current memory usage percent
-        memPercent.append(topwatPS.get_memory_percent())
+        mem_usage.append(topwat_ps.get_memory_info().rss)
         
         #sleep for a while
         sleep(MEASURE_TIME_INTERVAL)
     
     #end time
     end = time()
-    return (getMean(memPercent),getMean(cpuPercent),topwatProcess.stdout.read(),end - start)
+    return (get_mean(mem_usage), get_mean(cpu_percent), max(cpu_percent),
+            topwat_process.stdout.read(), end - start)
 
     
 def run_measurement():
@@ -106,12 +122,30 @@ def run_measurement():
                              neighbor_rel,
                              threads)            
   
-            print output_file_name + ' - ' + str(result)
+            pretty_print_measure_results(output_file_name, result)
     
     end = time()
     
-    print 'total time: ' + str(end - start)
+    print 'total time: ' + str(round_one_decimal(end - start)) + 's'
     
     
+def pretty_print_measure_results(output_file_name, measure_result):
+  
+    (mem_usage, cpu_percent, cpu_max, app_stdout, total_time) = measure_result
+    mem_usage_round = round_one_decimal(mem_usage / 1048576.) # to MB
+    cpu_percent_round = round_one_decimal(cpu_percent)
+    cpu_max_round = round_one_decimal(cpu_max)
+    top_wat_time, component_tree_time = parse_stdout(app_stdout)
+    top_wat_percent = (top_wat_time / total_time) * 100
+    top_wat_percent = round_one_decimal(top_wat_percent)
+    component_tree_percent = (component_tree_time / total_time) * 100
+    component_tree_percent = round_one_decimal(component_tree_percent)
+    total_time = round_one_decimal(total_time)
+    
+    print RESULT_FORMAT.format(output_file_name, total_time, top_wat_percent, 
+			        component_tree_percent, cpu_percent_round, \
+			        cpu_max_round, mem_usage_round)
+    
+
 if __name__ == "__main__":
     run_measurement()
