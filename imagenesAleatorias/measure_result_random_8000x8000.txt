@@ -1,0 +1,26 @@
+File random8000x8000_secuencial_r4.png - Total time 1730.5s (14.7% ct - 83.9% tw) average cpu 99.7% (max 109.8) average mem 21170.9MB
+File random8000x8000_secuencial_r8.png - Total time 1068.0s (29.6% ct - 68.2% tw) average cpu 99.5% (max 109.8) average mem 17567.1MB
+File random8000x8000_1-threads_r4.png - Total time 2318.5s (10.8% ct - 87.9% tw) average cpu 99.8% (max 109.6) average mem 22103.4MB
+File random8000x8000_1-threads_r8.png - Total time 1430.3s (22.2% ct - 75.9% tw) average cpu 99.8% (max 109.6) average mem 18264.4MB
+File random8000x8000_2-threads_r4.png - Total time 1229.5s (20.7% ct - 77.1% tw) average cpu 150.6% (max 219.1) average mem 21421.2MB
+File random8000x8000_2-threads_r8.png - Total time 874.7s (36.0% ct - 60.4% tw) average cpu 139.1% (max 209.3) average mem 17629.9MB
+File random8000x8000_4-threads_r4.png - Total time 796.8s (31.6% ct - 65.0% tw) average cpu 234.4% (max 418.3) average mem 20552.7MB
+File random8000x8000_4-threads_r8.png - Total time 668.8s (47.5% ct - 48.8% tw) average cpu 186.3% (max 418.3) average mem 17085.3MB
+File random8000x8000_8-threads_r4.png - Total time 599.2s (42.0% ct - 53.1% tw) average cpu 333.0% (max 816.6) average mem 19760.4MB
+File random8000x8000_8-threads_r8.png - Total time 575.1s (55.1% ct - 40.3% tw) average cpu 228.4% (max 816.7) average mem 16730.4MB
+File random8000x8000_16-threads_r4.png - Total time 505.6s (49.8% ct - 43.0% tw) average cpu 423.0% (max 1614.4) average mem 19179.6MB
+File random8000x8000_16-threads_r8.png - Total time 517.6s (62.2% ct - 32.9% tw) average cpu 264.0% (max 1615.3) average mem 16397.0MB
+total time: 12314.9s
+File random8000x8000_secuencial_r4.png - Total time 1537.4s (16.5% ct - 81.9% tw) average cpu 99.8% (max 109.8) average mem 21051.0MB
+File random8000x8000_secuencial_r8.png - Total time 1059.1s (29.9% ct - 68.0% tw) average cpu 99.7% (max 109.5) average mem 17557.8MB
+File random8000x8000_1-threads_r4.png - Total time 2289.2s (11.0% ct - 86.4% tw) average cpu 99.8% (max 109.8) average mem 22078.8MB
+File random8000x8000_1-threads_r8.png - Total time 1185.2s (26.9% ct - 66.1% tw) average cpu 99.1% (max 109.8) average mem 18057.2MB
+File random8000x8000_2-threads_r4.png - Total time 1150.9s (22.0% ct - 73.1% tw) average cpu 156.6% (max 219.1) average mem 21289.9MB
+File random8000x8000_2-threads_r8.png - Total time 874.1s (36.7% ct - 55.1% tw) average cpu 140.1% (max 209.3) average mem 17599.6MB
+File random8000x8000_4-threads_r4.png - Total time 796.5s (31.7% ct - 61.1% tw) average cpu 234.0% (max 418.3) average mem 20542.7MB
+File random8000x8000_4-threads_r8.png - Total time 666.6s (47.4% ct - 41.4% tw) average cpu 186.2% (max 418.5) average mem 17097.0MB
+File random8000x8000_8-threads_r4.png - Total time 602.5s (41.7% ct - 48.3% tw) average cpu 331.4% (max 816.5) average mem 19786.7MB
+File random8000x8000_8-threads_r8.png - Total time 560.7s (56.7% ct - 29.9% tw) average cpu 231.1% (max 816.6) average mem 16653.7MB
+File random8000x8000_16-threads_r4.png - Total time 479.7s (52.8% ct - 35.6% tw) average cpu 444.8% (max 1614.4) average mem 18922.1MB
+File random8000x8000_16-threads_r8.png - Total time 513.5s (61.7% ct - 23.8% tw) average cpu 265.1% (max 1615.2) average mem 16421.8MB
+total time: 11715.4s
